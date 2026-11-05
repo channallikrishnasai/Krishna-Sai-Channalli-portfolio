@@ -13,10 +13,12 @@ A single-page portfolio for Krishna Sai Channalli, a Computer Science Engineerin
 ## Features
 
 - Original Freefall falling, impact, rise and portfolio story.
-- Five project cards for OPERO, FaceRex, VaultIQ AI, InfraVision and CrisisFlow.
+- Five project cards for OPERO, VaultIQ AI, InfraVision, ODIN and FaceRex, each with a project-specific interactive flow visual.
 - Scroll-controlled, 240-frame portal walk-out animation, scrubbed in both directions and rendered through canvas with `requestAnimationFrame`.
 - Progressive image loading, bounded decoded-frame caches for both image sequences, a lower memory budget on mobile, and a fallback frame for the portal sequence.
-- Education, completed internship experience, hackathon participation and a categorized skills list.
+- Education, completed internship experience, hackathon participation and a categorized skills list with additional ODIN Android and on-device AI technologies.
+- Cinematic internship timeline panels with verified Codomax details and clearly marked missing Stoxra information.
+- Technology groups revealed on scroll, with restrained amber hover lighting and repository-backed project links.
 - Keyboard-accessible project, internship, achievement and technology detail dialogs, with repository links only where a public source is available.
 - Project-linked skills based on documented repository information; unverified project stacks, duties and dates are identified as unavailable rather than inferred.
 - Navigation menu with active-section indication, external links that open safely, and copy-email feedback.
@@ -24,19 +26,19 @@ A single-page portfolio for Krishna Sai Channalli, a Computer Science Engineerin
 
 ## Interactive portfolio details
 
-Project cards open a detail dialog with overview, problem, solution, technology, features and implementation notes. FaceRex, InfraVision and CrisisFlow have no verified source links or detailed stack information in the available materials, so their dialogs state those gaps. OPERO and VaultIQ AI link to their documented GitHub repositories. The related The-Opero repository is labeled separately from OPERO.
+Project cards open a detail dialog with overview, problem, solution, technology, features and implementation notes. Each project dialog includes an interactive flow or architecture visual. OPERO, VaultIQ AI and ODIN link to their documented GitHub repositories. FaceRex and InfraVision flows are explicitly illustrative because implementation details and public source links were not available. The related The-Opero repository is labeled separately from OPERO.
 
 Internship and achievement cards open detail dialogs. The Codomax role and certificate identifier/date are shown as supplied, but no certificate file or verified destination is available. Stoxra has no supplied role, date or responsibility details. Hackathon participation is separate from the reported Paytm Top 15 selection.
 
-Selecting a skill opens documented project connections when available. The interface does not assign proficiency scores. The menu scrolls to the corresponding section and marks the current chapter; its Escape key closes it. Dialogs can be dismissed with Escape or their close control, return focus to the opening control, and pause smooth scrolling while open. The contact section provides email, GitHub and LinkedIn links and a copy-email button with status feedback.
+Selecting a skill opens documented project connections when available. The interface does not assign proficiency scores. The menu scrolls to the corresponding section and marks the current chapter; its Escape key closes it. Dialogs can be dismissed with Escape or their close control, return focus to the opening control, and allow vertical scrolling inside the detail dialog. The contact section provides email, GitHub and LinkedIn links and a copy-email button with status feedback.
 
 ## Projects and source links
 
 - **OPERO:** The public [OPERO repository](https://github.com/channallikrishnasai/OPERO) describes a request → investigate → decide → act → verify workflow and a Phase 0 full-stack foundation; its README says voice integration is not implemented yet. The related [The-Opero desktop operator](https://github.com/channallikrishnasai/The-Opero) documents Python, PyQt6, Gemini, voice and screen context, and action modules.
-- **FaceRex:** Computer-vision face-recognition application with mobile-oriented inference. Project-specific stack and a public source or demo link have not been supplied.
 - **VaultIQ AI:** AI-assisted personal-finance application covering budgeting, goals, investment planning, documents and scenario workflows. Its [public repository](https://github.com/channallikrishnasai/vaultiq-ai) documents Next.js, TypeScript, Prisma, Tailwind CSS, SQLite and Supabase PostgreSQL.
 - **InfraVision:** AI-based infrastructure damage detection and image analysis. Project-specific stack and a public source or demo link have not been supplied.
-- **CrisisFlow:** Emergency-response and crisis-management command system. Project-specific stack and a public source or demo link have not been supplied.
+- **ODIN:** A local-first Android assistant. Its [public repository](https://github.com/channallikrishnasai/odin-android) documents Kotlin, Jetpack Compose, Material 3, Hilt, Room, local/remote assistant providers, speech and OCR paths, and configurable smart-home provider boundaries. Model assets, permissions and device setup are required for relevant features; target-device validation remains necessary.
+- **FaceRex:** Computer-vision face-recognition application with mobile-oriented inference. Project-specific stack and a public source or demo link have not been supplied. Its flow visual is illustrative.
 
 Project details in the portfolio are limited to information supplied by Krishna or described in these public repositories. No unverified demos, performance figures or project links are claimed.
 
@@ -53,7 +55,9 @@ Project details in the portfolio are limited to information supplied by Krishna 
 - **Animation:** Canvas 2D, `requestAnimationFrame`, scroll-driven image sequences
 - **Scrolling:** Lenis 1.1.13
 - **Fonts:** Archivo and Instrument Serif from Google Fonts
-- **Portfolio skills:** React, Next.js, TypeScript, JavaScript, Tailwind CSS, Python, FastAPI, PostgreSQL, Prisma, Redis, Supabase, ONNX, computer vision, Git, GitHub, Docker, Expo, Three.js, React Three Fiber and Framer Motion
+- **Portfolio technology groups:** React, Next.js, TypeScript, JavaScript, HTML5, CSS3, Tailwind CSS; Python, FastAPI, Node.js, PostgreSQL, Prisma, Redis, Supabase, REST APIs; ONNX, OpenCV, ML Kit OCR, computer vision, face recognition and AI application development; Kotlin, Android, Jetpack Compose, Material 3, Hilt, Room, DataStore, OkHttp, LiteRT-LM, MediaPipe, Vosk, MQTT and configurable smart-home provider integrations; Three.js, React Three Fiber and Framer Motion; Git, GitHub and Docker.
+
+Technology chips link to projects only where a public repository manifest, source file or project documentation supports the connection. The expanded Android stack reflects ODIN repository dependencies; Whisper is marked explored because a verified use in the featured ODIN implementation was not established. The FaceRex description was supplied, but no public source was available, so no model or inference runtime is claimed. React Native, Expo, standalone WebGL, MobileFaceNet, BlazeFace, MiniFASNet and Linux were not listed because the reviewed project sources did not verify them. ODIN is listed as native Kotlin/Android work.
 
 The page is static and has no build step or npm dependencies. Lenis and the fonts are loaded from CDNs.
 

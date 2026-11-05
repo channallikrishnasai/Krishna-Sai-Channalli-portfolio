@@ -469,18 +469,26 @@
   // ---------- manifesto words ----------
   const manifesto = $('#manifesto');
   const words = [];
-  (() => {
-    const text = manifesto.textContent.trim().split(/\s+/);
-    manifesto.textContent = '';
-    text.forEach((w, i) => {
-      const s = document.createElement('span');
-      s.className = 'w';
-      s.textContent = w;
-      manifesto.appendChild(s);
-      if (i < text.length - 1) manifesto.appendChild(document.createTextNode(' '));
-      words.push({ el: s, o: -1 });
+  $$('.manifesto-copy', manifesto).forEach((paragraph) => {
+    const text = paragraph.textContent.trim().split(/\s+/);
+    paragraph.replaceChildren();
+    text.forEach((word, index) => {
+      const span = document.createElement('span');
+      span.className = 'w';
+      span.textContent = word;
+      paragraph.appendChild(span);
+      if (index < text.length - 1) paragraph.appendChild(document.createTextNode(' '));
+      words.push({ el: span, o: -1 });
     });
-  })();
+  });
+
+  const aboutShowcase = $('#aboutShowcase');
+  if (aboutShowcase && !reduce && 'IntersectionObserver' in window) {
+    const aboutMotionObserver = new IntersectionObserver((entries) => {
+      for (const entry of entries) aboutShowcase.classList.toggle('is-active', entry.isIntersecting);
+    }, { rootMargin: '120px 0px', threshold: 0 });
+    aboutMotionObserver.observe(aboutShowcase);
+  } else if (aboutShowcase && !reduce) aboutShowcase.classList.add('is-active');
 
   // ---------- marquee ----------
   const marquees = $$('.marquee-row').map((row) => {
@@ -500,6 +508,132 @@
   });
   $('.svc-list').addEventListener('mouseleave', () => { pv.on = false; svcPreview.classList.remove('is-on'); });
 
+  // The archive stays inside the existing render architecture: IntersectionObserver
+  // gates its canvas work and the main RAF loop advances the atmosphere only in view.
+  const experienceArchive = $('#experienceArchive');
+  const archiveCanvas = $('#experienceAtmosphere');
+  const archiveCtx = archiveCanvas?.getContext('2d', { alpha: true });
+  const archiveFX = { visible: false, time: 0, width: 0, height: 0, dpr: 1, particles: [] };
+  function resizeArchiveFX() {
+    if (!archiveCanvas || !archiveCtx || !experienceArchive) return;
+    if (!archiveFX.visible) return;
+    const rect = experienceArchive.getBoundingClientRect();
+    const dpr = Math.min(devicePixelRatio || 1, innerWidth < 761 ? 1 : 1.25);
+    archiveFX.width = Math.max(1, rect.width);
+    archiveFX.height = Math.max(1, rect.height);
+    archiveFX.dpr = dpr;
+    archiveCanvas.width = Math.round(archiveFX.width * dpr);
+    archiveCanvas.height = Math.round(archiveFX.height * dpr);
+    archiveCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const random = rng(945434);
+    const count = innerWidth < 761 ? 22 : 46;
+    archiveFX.particles = Array.from({ length: count }, () => ({
+      x: random() * archiveFX.width, y: random() * archiveFX.height,
+      radius: 0.45 + random() * 1.4, speed: 3 + random() * 13,
+      drift: (random() - 0.5) * 9, phase: random() * Math.PI * 2,
+      hue: random() > 0.22 ? 28 : 244,
+    }));
+    drawArchiveFX(0, true);
+  }
+  function drawArchiveFX(dt, still = false) {
+    if (!archiveCtx || !archiveFX.width) return;
+    const ctx = archiveCtx, w = archiveFX.width, h = archiveFX.height;
+    ctx.clearRect(0, 0, w, h);
+    const cx = w * 0.5, cy = h * 0.235;
+    const core = ctx.createRadialGradient(cx, cy, 2, cx, cy, Math.min(w * 0.34, 390));
+    core.addColorStop(0, 'rgba(255,201,137,.13)');
+    core.addColorStop(.18, 'rgba(255,111,42,.08)');
+    core.addColorStop(1, 'rgba(255,91,26,0)');
+    ctx.fillStyle = core;
+    ctx.fillRect(0, 0, w, h * .64);
+    if (!still && !reduce) archiveFX.time += Math.min(dt, 50) / 1000;
+    const t = archiveFX.time;
+    ctx.globalCompositeOperation = 'lighter';
+    for (const p of archiveFX.particles) {
+      if (!still && !reduce) {
+        p.y -= p.speed * Math.min(dt, 50) / 1000;
+        p.x += Math.sin(t * .42 + p.phase) * p.drift * Math.min(dt, 50) / 1000;
+        if (p.y < -4) { p.y = h + 4; p.x = fract(p.x / w) * w; }
+        if (p.x < -4) p.x = w + 4;
+        if (p.x > w + 4) p.x = -4;
+      }
+      const shimmer = reduce || still ? .62 : .35 + (Math.sin(t * 1.8 + p.phase) + 1) * .25;
+      ctx.globalAlpha = shimmer;
+      ctx.fillStyle = p.hue === 28 ? 'rgba(255,177,103,.9)' : 'rgba(169,163,255,.8)';
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+    ctx.globalCompositeOperation = 'source-over';
+  }
+
+  // One observer reveals/pause-gates the archive and reveals technology groups.
+  if (!reduce && 'IntersectionObserver' in window) {
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.target === experienceArchive) {
+          archiveFX.visible = entry.isIntersecting;
+          entry.target.classList.toggle('is-visible', entry.isIntersecting);
+          if (entry.isIntersecting) {
+            if (!archiveFX.width) resizeArchiveFX();
+            else drawArchiveFX(0);
+          } else if (archiveCanvas) {
+            archiveCanvas.width = 0;
+            archiveCanvas.height = 0;
+            archiveFX.width = archiveFX.height = 0;
+            archiveFX.particles = [];
+          }
+          return;
+        }
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add('is-visible');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.14, rootMargin: '0px 0px -6% 0px' });
+    [experienceArchive, ...$$('.svc')].filter(Boolean).forEach((el) => {
+      el.classList.add('is-cinematic');
+      revealObserver.observe(el);
+    });
+  }
+
+  if (experienceArchive) {
+    resizeArchiveFX();
+    if (reduce) experienceArchive.classList.add('is-visible');
+    if (fine && !reduce) {
+      experienceArchive.addEventListener('pointermove', (event) => {
+        const bounds = experienceArchive.getBoundingClientRect();
+        const x = (event.clientX - bounds.left) / bounds.width;
+        const y = (event.clientY - bounds.top) / bounds.height;
+        experienceArchive.style.setProperty('--archive-x', `${(x * 100).toFixed(1)}%`);
+        experienceArchive.style.setProperty('--archive-y', `${(y * 100).toFixed(1)}%`);
+        $$('.experience-card', experienceArchive).forEach((card) => {
+          const r = card.getBoundingClientRect();
+          const px = clamp((event.clientX - (r.left + r.width / 2)) / (r.width / 2), -1, 1);
+          const py = clamp((event.clientY - (r.top + r.height / 2)) / (r.height / 2), -1, 1);
+          card.style.setProperty('--tilt-x', `${(-py * 2.2).toFixed(2)}deg`);
+          card.style.setProperty('--tilt-y', `${(px * 2.8).toFixed(2)}deg`);
+        });
+      }, { passive: true });
+      experienceArchive.addEventListener('pointerleave', () => {
+        experienceArchive.style.setProperty('--archive-x', '50%');
+        experienceArchive.style.setProperty('--archive-y', '45%');
+        $$('.experience-card', experienceArchive).forEach((card) => {
+          card.style.setProperty('--tilt-x', '0deg');
+          card.style.setProperty('--tilt-y', '0deg');
+        });
+      }, { passive: true });
+    }
+    $$('[data-experience-target]', experienceArchive).forEach((button) => {
+      button.addEventListener('click', () => {
+        const target = document.getElementById(button.dataset.experienceTarget);
+        if (!target) return;
+        if (lenis) lenis.scrollTo(target, { offset: -innerHeight * .35, duration: .9, force: true });
+        else target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'center' });
+        target.focus({ preventScroll: true });
+        Sound.tick();
+      });
+    });
+  }
+
   // ---------- measure ----------
   function measure() {
     S.W = innerWidth; S.H = innerHeight;
@@ -508,7 +642,7 @@
       const r = el.getBoundingClientRect();
       layout[id] = { top: r.top + scrollY, h: r.height };
     }
-    filmFall.resize(); filmPortal.resize(); ambient.resize();
+    filmFall.resize(); filmPortal.resize(); ambient.resize(); resizeArchiveFX();
     baseFeather = S.W / S.H < 0.8 ? 0 : 22;
 
     const base = Math.min(S.H, S.W * 1.25);
@@ -1015,6 +1149,7 @@
   const detailSummary = $('#detailSummary');
   const detailSections = $('#detailSections');
   const detailLinks = $('#detailLinks');
+  const detailVisual = $('#detailVisual');
   let detailReturnFocus = null;
 
   const DETAIL_DATA = {
@@ -1068,16 +1203,17 @@
           ['Implementation details', 'Model and implementation details are not verified.'],
         ], links: [],
       },
-      crisisflow: {
-        eyebrow: 'Emergency response · crisis management', title: 'CrisisFlow', accent: '#a8c99e',
-        summary: 'An emergency-response and crisis-management command system.',
+      odin: {
+        eyebrow: 'Local-first Android assistant', title: 'ODIN', accent: '#91baff',
+        summary: 'An Android assistant prototype that combines voice and text requests, local or configured assistant providers, device tools, and routines.',
         sections: [
-          ['Problem', 'Coordinate emergency-response workflows during crises.'],
-          ['Solution', 'A crisis-management command system, as described in the supplied project information.'],
-          ['Technology', 'Project-specific technologies have not been provided.'],
-          ['Key features', 'A feature list was not available in the materials reviewed.'],
-          ['Implementation details', 'Implementation details are not verified.'],
-        ], links: [],
+          ['Problem', 'Bring assistant requests, Android actions and configurable smart-home workflows into one native mobile experience.'],
+          ['Solution', 'A Kotlin and Compose app routes requests through assistant providers and tool capabilities, with explicit permission and setup boundaries.'],
+          ['Technology', 'Kotlin 2.1, Jetpack Compose, Material 3, Hilt, Room, DataStore, OkHttp, LiteRT-LM, MediaPipe, ML Kit text recognition, Vosk and MQTT integrations.'],
+          ['Key features', 'Documented capabilities include chat and local memory, routines and tool calls, speech input, text-to-speech fallback, camera OCR, fast paths for common actions, and configurable Home Assistant, MQTT, SwitchBot and Matter provider boundaries.'],
+          ['Architecture and implementation', 'The repository separates assistant providers, tools and routines, device providers, voice and Room-backed persistence. Requests can use a local model when configured or a selected remote provider.'],
+          ['Validation boundary', 'Model assets and smart-home credentials require configuration. OCR, speech and offline inference need target-device validation; the documented Matter dispatcher does not perform native cluster control. Example routines are configurable workflows, not verified live automations.'],
+        ], links: [['ODIN Android repository', 'https://github.com/channallikrishnasai/odin-android']],
       },
     },
     experience: {
@@ -1117,41 +1253,231 @@
   };
 
   const SKILL_PROJECTS = {
-    'react': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'react': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
     'next.js': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'typescript': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'tailwind css': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'postgresql': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'typescript': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
+    'javascript': [['Krishna Sai portfolio', 'https://github.com/channallikrishnasai/Krishna-Sai-Channalli-portfolio'], ['Project Management Tool', 'https://github.com/channallikrishnasai/project-management-tool']],
+    'html5': [['Krishna Sai portfolio', 'https://github.com/channallikrishnasai/Krishna-Sai-Channalli-portfolio']],
+    'css3': [['Krishna Sai portfolio', 'https://github.com/channallikrishnasai/Krishna-Sai-Channalli-portfolio']],
+    'tailwind css': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI']],
+    'python': [['The-Opero', 'https://github.com/channallikrishnasai/The-Opero'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH'], ['Ecommerce Store', 'https://github.com/channallikrishnasai/Ecommerce_Store']],
+    'fastapi': [['The-Opero', 'https://github.com/channallikrishnasai/The-Opero'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
+    'node.js': [['OPERO', 'https://github.com/channallikrishnasai/OPERO']],
+    'postgresql': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
     'prisma': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'javascript': [['Krishna Sai portfolio', '']],
-    'python': [['The-Opero (related desktop operator)', 'https://github.com/channallikrishnasai/The-Opero']],
-    'supabase': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'computer vision': [['FaceRex (project description supplied; source link not provided)', '']],
-    'face recognition': [['FaceRex (project description supplied; source link not provided)', '']],
-    'ai application development': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['The-Opero (related desktop operator)', 'https://github.com/channallikrishnasai/The-Opero']],
-    'three.js': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'react three fiber': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
-    'framer motion': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'redis': [['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
+    'supabase': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI']],
+    'rest apis': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
+    'onnx': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
+    'opencv': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
+    'computer vision': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH'], ['FaceRex (description supplied; no public source link)', '']],
+    'face recognition': [['FaceRex (description supplied; no public source link)', '']],
+    'ai application development': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['The-Opero', 'https://github.com/channallikrishnasai/The-Opero']],
+    'kotlin': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'android': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'three.js': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'react three fiber': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'framer motion': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI']],
+    'git': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
+    'github': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
+    'docker': [['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
+    'gemini': [['The-Opero', 'https://github.com/channallikrishnasai/The-Opero'], ['KAVACH (optional advisory)', 'https://github.com/channallikrishnasai/KAVACH']],
+    'sqlite': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'playwright': [['OPERO', 'https://github.com/channallikrishnasai/OPERO']],
+    'litert-lm': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'mediapipe': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'vosk': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'ml kit ocr': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'jetpack compose': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'material 3': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'hilt': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'room': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'datastore': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'mqtt': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'okhttp': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'home assistant': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'switchbot': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
+    'matter': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
   };
+
+  const SKILL_META = {
+    'react': ['Frontend engineering', 'used', 'React is listed in OPERO, VaultIQ AI, and KAVACH project documentation.'],
+    'next.js': ['Frontend engineering', 'used', 'Next.js is listed in the OPERO and VaultIQ project stacks.'],
+    'typescript': ['Frontend engineering', 'used', 'TypeScript is listed in OPERO, VaultIQ AI, and KAVACH project documentation.'],
+    'javascript': ['Frontend engineering', 'used', 'JavaScript powers this portfolio and is used in the documented web projects.'],
+    'html5': ['Frontend engineering', 'used', 'HTML structures this portfolio.'],
+    'css3': ['Frontend engineering', 'used', 'CSS styles this portfolio.'],
+    'tailwind css': ['Frontend engineering', 'used', 'Tailwind CSS is listed in the OPERO and VaultIQ project stacks.'],
+    'python': ['Backend engineering', 'used', 'Python is used by The-Opero and documented in related project sources.'],
+    'fastapi': ['Backend engineering', 'used', 'FastAPI is documented in KAVACH and related project sources.'],
+    'node.js': ['Backend engineering', 'used', 'Node.js is used for the OPERO API foundation.'],
+    'rest apis': ['Backend engineering', 'used', 'API routes and service endpoints are documented in OPERO and related projects.'],
+    'ai application development': ['AI & machine learning', 'used', 'AI application work is documented in VaultIQ AI and The-Opero.'],
+    'gemini': ['AI & machine learning', 'used', 'The-Opero documents Gemini integration. KAVACH documents Gemini as an optional advisory that cannot approve or dispatch. This is separate from the public OPERO Phase 0 repository.'],
+    'onnx': ['Computer vision', 'used', 'KAVACH includes a local ONNX Runtime road-damage provider; compatible model weights require separate configuration.'],
+    'opencv': ['Computer vision', 'used', 'KAVACH uses OpenCV for image and video frame processing.'],
+    'face recognition': ['Computer vision', 'explored', 'FaceRex is described as a face-recognition application, but no public source, model, or runtime was supplied to verify implementation details.'],
+    'kotlin': ['Mobile development', 'used', 'Kotlin is used by the ODIN Android assistant repository.'],
+    'android': ['Mobile development', 'used', 'ODIN is documented as a native Android assistant.'],
+    'postgresql': ['Databases & infrastructure', 'used', 'PostgreSQL is listed in the OPERO and VaultIQ project documentation.'],
+    'prisma': ['Databases & infrastructure', 'used', 'Prisma is documented in OPERO and VaultIQ.'],
+    'sqlite': ['Databases & infrastructure', 'used', 'SQLite is listed as the development database in VaultIQ documentation.'],
+    'supabase': ['Databases & infrastructure', 'used', 'Supabase PostgreSQL and Supabase services are documented in VaultIQ.'],
+    'redis': ['Databases & infrastructure', 'used', 'Redis is linked to the LifeOS AI and SocialMediaPlatform repositories in the existing technology evidence.'],
+    'docker': ['Developer tools', 'used', 'Docker is linked to related project repositories in the existing technology evidence.'],
+    'three.js': ['3D & creative development', 'used', 'Three.js is listed in the OPERO and VaultIQ project manifests and documentation.'],
+    'react three fiber': ['3D & creative development', 'used', 'React Three Fiber is listed in the OPERO and VaultIQ project manifests.'],
+    'framer motion': ['3D & creative development', 'used', 'Framer Motion is listed in the OPERO and VaultIQ project stacks.'],
+    'git': ['Developer tools', 'used', 'Git is used to version the portfolio and documented software projects.'],
+    'github': ['Developer tools', 'used', 'GitHub hosts the public repositories linked from this portfolio.'],
+    'playwright': ['Developer tools', 'used', 'Playwright is listed as a development dependency in OPERO.'],
+    'litert-lm': ['AI & machine learning', 'used', 'LiteRT-LM is documented as a selectable local-model runtime; using it depends on model compatibility and downloaded assets.'],
+    'mediapipe': ['AI & machine learning', 'used', 'MediaPipe libraries are included in ODIN for supported model and text-processing paths; exact runtime varies by model family.'],
+    'vosk': ['AI & machine learning', 'used', 'Vosk is included as a speech-recognition option in ODIN; microphone permissions and device validation apply.'],
+    'whisper': ['AI & machine learning', 'explored', 'Whisper is marked explored; a specific verified Whisper implementation in the featured project was not established.'],
+    'ml kit ocr': ['Computer vision', 'used', 'ODIN documents ML Kit Latin text recognition for camera OCR; it is not a claim of universal-language OCR.'],
+    'jetpack compose': ['Mobile development', 'used', 'ODIN uses Jetpack Compose for its native Android UI.'],
+    'material 3': ['Mobile development', 'used', 'ODIN uses Material 3 components in its Compose interface.'],
+    'hilt': ['Mobile development', 'used', 'Hilt is included for dependency injection in ODIN.'],
+    'room': ['Databases & infrastructure', 'used', 'Room is used for ODIN local persistence.'],
+    'datastore': ['Databases & infrastructure', 'used', 'DataStore preferences are included in the ODIN Android app.'],
+    'mqtt': ['Mobile development', 'used', 'ODIN documents MQTT-based provider integration; device connectivity requires configuration.'],
+    'okhttp': ['Backend engineering', 'used', 'ODIN includes OkHttp for network requests and event-stream support.'],
+    'home assistant': ['Mobile development', 'used', 'Home Assistant is a configurable ODIN device-provider integration, not a guarantee of connected devices.'],
+    'switchbot': ['Mobile development', 'used', 'SwitchBot appears as a configurable ODIN device-provider integration.'],
+    'matter': ['Mobile development', 'used', 'ODIN includes a Matter provider boundary; its repository notes native cluster dispatch is not implemented.'],
+  };
+
+  const PROJECT_FLOWS = {
+    opero: {
+      title: 'OPERO / DOCUMENTED WORKFLOW', badge: 'REQUEST → VERIFIED ACTION', color: 'opero',
+      foot: 'Documented OPERO sequence · voice integration is not implemented in the Phase 0 repository',
+      steps: [
+        ['Speak', '01 / SPEAK', 'A person expresses a work request. The OPERO repository documents the stage; voice integration is not implemented in its Phase 0 foundation.'],
+        ['Understand', '02 / UNDERSTAND', 'The documented workflow moves from request understanding into the investigation and decision stages.'],
+        ['Investigate', '03 / INVESTIGATE', 'Investigate is a named stage in the documented request-to-action workflow.'],
+        ['Decide', '04 / DECIDE', 'The workflow records a decision stage before action.'],
+        ['Act', '05 / ACT', 'Act is followed by verification in the documented sequence.'],
+        ['Verify', '06 / VERIFY', 'The workflow includes verification before reporting the result.'],
+        ['Report', '07 / REPORT', 'The final documented stage reports the outcome.'],
+      ],
+    },
+    vaultiq: {
+      title: 'VAULTIQ AI / APPLICATION ARCHITECTURE', badge: 'PLAN · STORE · ANALYZE', color: 'vault',
+      foot: 'Repository-backed architecture map · no automated financial transactions are implied',
+      steps: [
+        ['Finance UI', '01 / FINANCE MODULES', 'The application documents dashboard modules for expenses, budgets, goals, investments, documents and scenarios.'],
+        ['App Router', '02 / NEXT.JS ROUTES', 'The repository uses the Next.js App Router and API routes as the application and service boundary.'],
+        ['Prisma', '03 / DATA ACCESS', 'Prisma is documented for core application data access.'],
+        ['Databases', '04 / STORAGE', 'SQLite is documented for local development; Supabase PostgreSQL is documented for hosted chat storage.'],
+        ['AI providers', '05 / AI INTEGRATIONS', 'The repository documents multiple AI provider integrations for assistant features. Provider configuration is required.'],
+      ],
+    },
+    infravision: {
+      title: 'INFRAVISION / CONCEPT FLOW', badge: 'ILLUSTRATIVE · DETAILS UNVERIFIED', color: 'infra',
+      foot: 'Illustrative from the supplied project description · implementation flow, model and stack are unverified',
+      steps: [
+        ['Image input', '01 / IMAGE INPUT', 'An infrastructure image is the input suggested by the supplied project description; no capture or upload implementation was verified.'],
+        ['Damage analysis', '02 / ANALYSIS CONCEPT', 'AI-based damage detection and image analysis are described, but the model and processing steps are unavailable.'],
+        ['Review', '03 / REVIEW CONCEPT', 'A review output is shown only as a conceptual endpoint. No specific report or decision feature was verified.'],
+      ],
+    },
+    odin: {
+      title: 'ODIN / REQUEST TO DEVICE RESULT', badge: 'LOCAL-FIRST · CAPABILITY CHECKED', color: 'odin',
+      foot: 'Repository-documented provider boundaries · examples require configured permissions, providers and devices',
+      steps: [
+        ['Request', '01 / REQUEST', 'A request can arrive by typed chat or supported speech input. Speech engines and permissions need device setup.'],
+        ['Route', '02 / ROUTE REQUEST', 'The app can handle documented fast paths or select a configured assistant provider; local models need downloaded assets.'],
+        ['Capability', '03 / CHECK CAPABILITY', 'Tool and device-provider boundaries determine whether an action is available in the configured environment.'],
+        ['Permission', '04 / SETUP + PERMISSION', 'Unavailable providers or missing permissions return an explicit setup or capability result; actions must not be reported as completed.'],
+        ['Result', '05 / REPORT RESULT', 'The documented flow reports a confirmed action or a failure/unavailable result. Voice output can use the configured TTS path.'],
+      ],
+    },
+    facerex: {
+      title: 'FACEREX / CONCEPT FLOW', badge: 'ILLUSTRATIVE · IMPLEMENTATION UNKNOWN', color: 'face',
+      foot: 'Illustrative from the supplied FaceRex description · model, runtime, enrollment and matching behavior are unverified',
+      steps: [
+        ['Mobile image', '01 / MOBILE INPUT', 'The supplied description calls FaceRex a mobile-oriented face-recognition application; the capture implementation is unknown.'],
+        ['Vision', '02 / COMPUTER VISION', 'Face recognition is part of the supplied description. No specific detection or recognition model was verified.'],
+        ['Inference', '03 / MOBILE INFERENCE', 'Mobile-oriented inference is mentioned, but runtime, data handling and result behavior are not documented.'],
+      ],
+    },
+  };
+
+  const projectArt = Object.fromEntries(Object.entries(PROJECT_FLOWS).map(([key, flow]) => [key,
+    `<div class="project-art project-art--${flow.color}" data-flow-kind="${key}"><div class="art-caption"><span>${flow.title}</span><b>${flow.badge}</b></div><div class="flow-visual flow-visual--${flow.color}" aria-hidden="true"><span class="flow-orbit flow-orbit--a"></span><span class="flow-orbit flow-orbit--b"></span><span class="flow-core"></span><span class="flow-spark flow-spark--a"></span><span class="flow-spark flow-spark--b"></span></div><div class="automation-graph-scroll" tabindex="0" aria-label="Scroll horizontally through the ${key} flow"><div class="automation-graph" role="group" aria-label="${flow.title}">${flow.steps.map(([label], index) => `${index ? '<span class="flow-edge" aria-hidden="true"></span>' : ''}<button type="button" class="flow-node${index === 0 ? ' is-active' : ''}" data-flow-step="${index}" aria-pressed="${index === 0}"><i>${String(index + 1).padStart(2, '0')}</i><b>${label}</b><small>Select to inspect</small></button>`).join('')}</div></div><div class="flow-inspector" aria-live="polite"><b class="flow-inspector-title">${flow.steps[0][1]}</b><p class="flow-inspector-copy">${flow.steps[0][2]}</p></div><p class="art-foot">${flow.foot}</p></div>`
+  ]));
+
+  $$('.skill-chip').forEach((chip) => {
+    const level = chip.dataset.level || 'explored';
+    chip.title = `${level === 'used' ? 'Used in projects' : level === 'explored' ? 'Explored' : 'Familiar with'} — open for context`;
+    chip.setAttribute('aria-description', level === 'used' ? 'Used in projects' : level === 'explored' ? 'Explored' : 'Familiar with');
+  });
 
   function skillDetail(name) {
     const matches = SKILL_PROJECTS[name.toLowerCase()] || [];
-    const sections = matches.length
-      ? [['Verified project use', matches.map(([project]) => project).join(' · ') + '. Project-specific stack details are linked below where a public repository is available.']]
-      : [['Verified project use', 'No project-specific use is documented in the available materials for the featured projects, so this skill has not been assigned to a project.']];
+    const meta = SKILL_META[name.toLowerCase()] || ['Developer tools', 'explored', 'No implementation-specific project evidence is available in the reviewed sources.'];
+    const notes = {
+      onnx: 'KAVACH implements a local ONNX Runtime road-damage provider. Compatible model weights and a verified model license must be configured separately.',
+      opencv: 'KAVACH uses OpenCV for image and video frame processing. Its non-classifying contrast cues are not presented as damage detections; model detections require a compatible configured ONNX model.',
+      'face recognition': 'This project connection is based on the supplied FaceRex description. No public source or model implementation details were available to verify.',
+    };
+    const levelName = meta[1] === 'used' ? 'Used in projects' : meta[1] === 'explored' ? 'Explored' : 'Familiar with';
+    const sections = [
+      ['Experience', levelName + ' · ' + meta[0] + '. ' + meta[2]],
+      [matches.length ? 'Project connections' : 'Project evidence', matches.length
+        ? matches.map(([project]) => project).join(' · ') + '. Repository links are included where available.'
+        : 'No verified repository or implementation connection is available in the reviewed sources.'],
+    ];
+    if (notes[name.toLowerCase()]) sections.push(['Implementation note', notes[name.toLowerCase()]]);
     return {
       eyebrow: 'Technical skill', title: name, accent: '#ffb23f',
-      summary: 'Project connections are shown only when the available project documentation supports them.',
+      summary: 'Project connections are shown only where a repository manifest, source file or project documentation supports the technology.',
       sections,
       links: matches.filter(([, url]) => url).map(([project, url]) => [project + ' repository', url]),
     };
   }
 
   function renderDetail(detail, trigger) {
+    detailDialog.scrollTop = 0;
+    detailDialog.dataset.detailKind = (trigger?.dataset.detail || '').split(':')[0] || '';
     detailEyebrow.textContent = detail.eyebrow;
     detailTitle.textContent = detail.title;
     detailSummary.textContent = detail.summary;
     detailDialog.style.setProperty('--detail-accent', detail.accent || '#ffb23f');
+    const detailType = (trigger?.dataset.detail || '').split(':');
+    const art = detailType[0] === 'project' ? projectArt[detailType[1]] : '';
+    detailVisual.replaceChildren();
+    detailVisual.hidden = !art;
+    if (art) {
+      detailVisual.innerHTML = art;
+      const flowTitle = $('.flow-inspector-title', detailVisual);
+      const flowCopy = $('.flow-inspector-copy', detailVisual);
+      $$('[data-flow-step]', detailVisual).forEach((node) => node.addEventListener('click', () => {
+        const index = Number(node.dataset.flowStep);
+        const flow = PROJECT_FLOWS[detailType[1]];
+        const item = flow?.steps[index]?.slice(1);
+        if (!item) return;
+        $$('[data-flow-step]', detailVisual).forEach((other) => {
+          const active = other === node;
+          other.classList.toggle('is-active', active);
+          other.setAttribute('aria-pressed', String(active));
+        });
+        flowTitle.textContent = item[0];
+        flowCopy.textContent = item[1];
+      }));
+      const pause = document.createElement('button');
+      pause.className = 'art-motion-toggle';
+      pause.type = 'button';
+      pause.textContent = 'Pause visual motion';
+      pause.setAttribute('aria-pressed', 'false');
+      pause.addEventListener('click', () => {
+        const paused = detailVisual.classList.toggle('is-paused');
+        pause.textContent = paused ? 'Resume visual motion' : 'Pause visual motion';
+        pause.setAttribute('aria-pressed', String(paused));
+      });
+      detailVisual.appendChild(pause);
+    }
     detailSections.replaceChildren();
     detail.sections.forEach(([heading, body]) => {
       const section = document.createElement('section');
@@ -1193,7 +1519,7 @@
       detailLinks.appendChild(note);
     }
     detailReturnFocus = trigger;
-    if (lenis) lenis.stop();
+    html.classList.add('detail-open');
     if (!detailDialog.open) detailDialog.showModal();
     requestAnimationFrame(() => detailClose.focus());
   }
@@ -1209,7 +1535,7 @@
 
   detailClose.addEventListener('click', () => detailDialog.close());
   detailDialog.addEventListener('close', () => {
-    if (lenis && S.entered && !html.classList.contains('menu-open')) lenis.start();
+    html.classList.remove('detail-open');
     if (detailReturnFocus?.isConnected) detailReturnFocus.focus();
   });
   detailDialog.addEventListener('click', (e) => { if (e.target === detailDialog) detailDialog.close(); });
@@ -1306,15 +1632,33 @@
   }
   $$('[data-enter]').forEach((b) => b.addEventListener('click', () => enter(b.dataset.enter === 'sound')));
 
+  const showEntry = () => {
+    if (S.entered || !loader.isConnected) return;
+    loader.classList.add('is-ready');
+    const first = $('[data-enter="sound"]');
+    if (first) first.focus({ preventScroll: true });
+  };
+  const loaderFallback = setTimeout(() => {
+    if (S.entered || !loader.isConnected) return;
+    loadStatus.setAttribute('role', 'status');
+    loadStatus.removeAttribute('aria-valuemin');
+    loadStatus.removeAttribute('aria-valuemax');
+    loadStatus.textContent = 'The story is ready to enter; remaining frames can finish loading as you explore.';
+    showEntry();
+  }, 12000);
   fall.load(compactMemory ? 4 : 8, (r) => {
     const v = Math.round(r * 100);
     loadPct.textContent = v;
     loadStatus.setAttribute('aria-valuenow', String(v));
     loadFill.style.height = v + '%';
   }).then(() => {
-    loader.classList.add('is-ready');
-    const first = $('[data-enter="sound"]');
-    if (first && !S.entered) first.focus({ preventScroll: true });
+    clearTimeout(loaderFallback);
+    if (S.entered) return;
+    loadStatus.setAttribute('role', 'progressbar');
+    loadStatus.setAttribute('aria-valuemin', '0');
+    loadStatus.setAttribute('aria-valuemax', '100');
+    loadStatus.innerHTML = '<span id="loadPct">100</span>% of the story loaded';
+    showEntry();
   });
 
   // ---------- main loop ----------
@@ -1347,6 +1691,7 @@
     updateStory();
     updateWork();
     updateAbout();
+    if (archiveFX.visible && !reduce) drawArchiveFX(dt);
     updateMarquee(dt);
     updateServices();
     updatePortal();
