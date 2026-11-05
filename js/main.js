@@ -1,4 +1,4 @@
-/* Freefall: scroll engine for the Arin Vale portfolio.
+/* Freefall: scroll engine for the Krishna Sai Channalli portfolio.
    One requestAnimationFrame loop reads the scroll position and drives
    both films, the 3D type world and every section after it. */
 (() => {
@@ -54,6 +54,9 @@
       this.everLoaded = new Uint8Array(count);
       this.loaded = 0;
       this.maxCached = options.maxCached ?? Infinity;
+      this.anchorStride = Number.isFinite(this.maxCached)
+        ? Math.ceil(count / Math.max(2, Math.floor(this.maxCached / 2)))
+        : count;
       this.lru = [];
       this.queue = [];
       this.queued = new Map();
@@ -157,13 +160,14 @@
       this.ok[i] = 1;
       this.touch(i);
       while (this.lru.length > this.maxCached) {
-        const at = this.lru.findIndex((frame) => frame !== 0 && frame !== this.count - 1);
+        const at = this.lru.findIndex((frame) => !this.isAnchor(frame));
         if (at < 0) break;
         const [old] = this.lru.splice(at, 1);
         this.imgs[old] = null;
         this.ok[old] = 0;
       }
     }
+    isAnchor(i) { return i === 0 || i === this.count - 1 || i % this.anchorStride === 0; }
     has(i) { return this.ok[i] === 1; }
     get(i) {
       i = clamp(Math.round(i), 0, this.count - 1);
@@ -251,10 +255,11 @@
     }
   }
 
-  const fall = new Seq('assets/fall', FALL_N);
+  const compactMemory = matchMedia('(max-width: 760px)').matches;
+  const fall = new Seq('assets/fall', FALL_N, { maxCached: compactMemory ? 8 : 16 });
   const portal = new Seq('assets/portal-scroll', PORTAL_N, {
     fileName: (i) => `frame_${String(i + 1).padStart(4, '0')}.jpg`,
-    maxCached: 12,
+    maxCached: compactMemory ? 6 : 12,
   });
   const filmFall = new Film($('#filmCanvas'), fall, 0.5, 0.5, 1.75);
   const filmPortal = new Film($('#portalCanvas'), portal, 0.5, 0.45, 1.5);
@@ -266,7 +271,7 @@
   const ambient = new Ambient($('#ambient'));
 
   // ---------- story timeline (in story progress 0..1) ----------
-  const CUT = 0.47;     // hard cut from the shaft to the crowd, hidden in the flash
+  const CUT = 0.47;     // hard cut from the shaft to the impact sequence, hidden in the flash
   const SHOCK = 0.585;  // fire ring leaves the figure
   const FRAME_KEYS = [[0, 0], [0.42, 205], [CUT, 217], [0.58, 270], [0.67, 312], [0.86, 464], [1, 464]];
   const frameAt = (p) => {
@@ -281,40 +286,40 @@
   const WORLD = {
     fall: {
       back: [
-        ['Freefall', 'xl ghost'], ['trust the drop', 'serif'], ['Art direction', 'tag'], ['Let go', 'xl'],
-        ['the floor is a rumour', 'serif molten'], ['Gravity', 'l ghost molten'], ['Brand identity', 'tag'],
-        ['No net', 'xl molten'], ['deadline: yesterday', 'serif'], ['Motion design', 'tag'], ['Light', 'l ghost'],
+        ['Freefall', 'xl ghost'], ['trust the drop', 'serif'], ['CSE student', 'tag'], ['Let go', 'xl'],
+        ['ideas in motion', 'serif molten'], ['Gravity', 'l ghost molten'], ['Software engineering', 'tag'],
+        ['No net', 'xl molten'], ['curiosity first', 'serif'], ['AI & full-stack', 'tag'], ['Light', 'l ghost'],
       ],
       front: [['Fall', 'xxl ghost'], ['Deeper', 'xxl ghost']],
     },
     crowd: {
       back: [
-        ['make the logo bigger', 'serif ash'], ['Noise', 'xl ghost ash'], ['can it pop more?', 'serif ash'],
-        ['like theirs, but cheaper', 'serif ash'], ['Same', 'l ash'], ["we've always done it this way", 'serif ash'], ['safe', 'm ash'],
-        ['by friday?', 'serif ash'], ['Echo', 'l ghost ash'], ['does it have to be weird?', 'serif ash'], ['more blue', 'm ash'],
+        ['too much input', 'serif ash'], ['Noise', 'xl ghost ash'], ['find the signal', 'serif ash'],
+        ['filter the noise', 'serif ash'], ['Focus', 'l ash'], ['one thing at a time', 'serif ash'], ['keep moving', 'm ash'],
+        ['look closer', 'serif ash'], ['Patterns', 'l ghost ash'], ['make sense of it', 'serif ash'], ['keep learning', 'm ash'],
       ],
       front: [['Noise', 'xxl ghost']],
     },
     rise: {
       back: [
-        ['Stand up', 'xl ghost ember'], ['one of one', 'serif'], ['Glow', 'xl molten'], ['still burning', 'serif molten'],
-        ['Original', 'l ghost'], ['louder than the room', 'serif'], ['Unmistakable', 'l ember'],
+        ['Build', 'xl ghost ember'], ['learn by doing', 'serif'], ['Glow', 'xl molten'], ['keep exploring', 'serif molten'],
+        ['Create', 'l ghost'], ['solve real problems', 'serif'], ['Keep going', 'l ember'],
       ],
       front: [],
     },
   };
   const LINES = [
     ['Every idea begins as a fall.', 0.035, 0.17, -0.1],
-    ['No net, no brief. Just gravity and instinct.', 0.13, 0.27, 0.12],
-    ['You learn the shape of things on the way down.', 0.24, 0.38, -0.08],
+    ['No map yet. Just curiosity and a first step.', 0.13, 0.27, 0.12],
+    ['You learn the shape of things by building.', 0.24, 0.38, -0.08],
     ['Then the light gets louder.', 0.34, 0.47, 0.06],
     ['And you land in the noise.', 0.485, 0.6, 0],
     ['The noise clears. Something is still glowing.', 0.62, 0.74, 0],
-    ['Design is whatever is left standing.', 0.765, 0.88, 0],
+    ['Build what helps someone move forward.', 0.765, 0.88, 0],
   ];
   const CTAS = [
-    ['See the work', 'work', 'fall', -0.3], ['Start a project', 'contact', 'fall', 0.32],
-    ['See the work', 'work', 'rise', 0.3], ['Start a project', 'contact', 'rise', -0.28],
+    ['See the work', 'work', 'fall', -0.3], ['Say hello', 'contact', 'fall', 0.32],
+    ['See the work', 'work', 'rise', 0.3], ['Say hello', 'contact', 'rise', -0.28],
   ];
 
   const P = 900; // must match .world perspective
@@ -387,7 +392,7 @@
       let z = it.z + lerp(it.zIn, it.zOut, t);
       let xs = it.xs, rz = 0;
       if (it.set === 'crowd' && shockT > 0) {
-        // the fire ring blows the crowd's voices out of frame
+        // the fire ring blows the ambient voices out of frame
         const dir = xs >= 0 ? 1 : -1;
         const e = easeOut(shockT);
         xs += dir * (0.35 + Math.abs(xs)) * e * 1.2;
@@ -498,7 +503,7 @@
   // ---------- measure ----------
   function measure() {
     S.W = innerWidth; S.H = innerHeight;
-    for (const id of ['story', 'work', 'about', 'services', 'portal', 'contact']) {
+    for (const id of ['story', 'work', 'about', 'achievements', 'services', 'portal', 'contact']) {
       const el = document.getElementById(id);
       const r = el.getBoundingClientRect();
       layout[id] = { top: r.top + scrollY, h: r.height };
@@ -513,7 +518,7 @@
       tl.el.style.height = f1(w / tl.ar) + 'px';
     });
 
-    // the fire ring sits where the figure lands in the crowd shot (43% down the frame)
+    // the fire ring sits at the figure's landing point (43% down the frame)
     const fw = Math.min(S.W, S.H * 0.72), fh = S.H;
     const sc = Math.max(fw / 720, fh / 1280);
     const dh = 1280 * sc;
@@ -748,9 +753,22 @@
   }
 
   // ---------- HUD ----------
-  const CHAPTERS = ['The leap', 'Impact', 'The noise', 'Rise', 'Index', 'Selected work', 'About', 'Services', 'The portal', 'Contact'];
+  const CHAPTERS = ['The leap', 'Impact', 'The noise', 'Rise', 'Index', 'Selected work', 'About', 'Achievements', 'Skills', 'The portal', 'Contact'];
+  const NAV_CHAPTER_KEYS = ['story:0', 'story:0', 'story:.53', 'story:.77', 'work', 'work', 'about', 'achievements', 'services', 'portal', 'contact'];
+  const navLinks = $$('.menu-list a[data-nav-key]');
+  let activeNavKey = '';
+  function setActiveNav(chapter) {
+    const key = NAV_CHAPTER_KEYS[chapter];
+    if (!key || key === activeNavKey) return;
+    activeNavKey = key;
+    navLinks.forEach((link) => {
+      const active = link.dataset.navKey === key;
+      link.classList.toggle('is-active', active);
+      if (active) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  }
   const hudState = { ch: -1, read: '', bar: -1 };
-  const fmtAlt = (v) => Math.round(v).toLocaleString('en-US').replace(/,/g, ' ');
   function updateHud() {
     const L = layout.story;
     const mid = S.y + S.H * 0.5;
@@ -758,23 +776,25 @@
     let ch;
     if (mid < L.top + L.h) ch = p < 0.44 ? 0 : p < 0.5 ? 1 : p < 0.66 ? 2 : p < 0.86 ? 3 : 4;
     else if (mid < layout.about.top) ch = 5;
-    else if (mid < layout.services.top) ch = 6;
-    else if (mid < layout.portal.top) ch = 7;
-    else if (mid < layout.contact.top) ch = 8;
-    else ch = 9;
+    else if (mid < layout.achievements.top) ch = 6;
+    else if (mid < layout.services.top) ch = 7;
+    else if (mid < layout.portal.top) ch = 8;
+    else if (mid < layout.contact.top) ch = 9;
+    else ch = 10;
 
     if (ch !== hudState.ch) {
       hudState.ch = ch;
       hudNum.textContent = String(ch + 1).padStart(2, '0');
       hudName.textContent = CHAPTERS[ch];
     }
+    setActiveNav(ch);
     const total = document.documentElement.scrollHeight - S.H;
     const pct = clamp(S.y / total);
     let read;
-    if (ch <= 1) read = `Altitude ${fmtAlt(lerp(12400, 0, clamp(p / CUT)))} m`;
+    if (ch <= 1) read = 'In freefall';
     else if (ch <= 3) read = 'Ground level';
     else if (ch === 4) read = 'Index of work';
-    else if (ch === 5) read = `Case ${(S.workCase || 0) + 1} of 4`;
+    else if (ch === 5) read = `Project ${(S.workCase || 0) + 1} of ${screens.length}`;
     else read = `${Math.round(pct * 100)}% down`;
     if (read !== hudState.read) { hudState.read = read; hudRead.textContent = read; }
     const b = Math.round(pct * 1000);
@@ -786,18 +806,24 @@
   const cDot = $('.cursor-dot'), cRing = $('.cursor-ring'), cLabel = $('.cursor-ring span');
   const ring = { x: S.cx, y: S.cy };
   let cursorTarget = null;
-  if (fine) html.classList.add('has-cursor');
   addEventListener('pointermove', (e) => {
+    if (fine && S.entered) html.classList.add('has-cursor');
     S.cx = e.clientX; S.cy = e.clientY;
     S.mx = (e.clientX / S.W) * 2 - 1;
     S.my = (e.clientY / S.H) * 2 - 1;
   }, { passive: true });
   document.addEventListener('pointerover', (e) => {
-    const t = e.target.closest && e.target.closest('[data-cursor]');
+    const t = e.target.closest && e.target.closest('[data-cursor], [data-detail]');
     if (t === cursorTarget) return;
     cursorTarget = t;
-    if (t) { cLabel.textContent = t.dataset.cursor; cursor.classList.add('is-label'); Sound.tick(); }
+    if (t) { cLabel.textContent = t.dataset.cursor || 'Open'; cursor.classList.add('is-label'); Sound.tick(); }
     else cursor.classList.remove('is-label');
+  });
+  addEventListener('pointerleave', () => {
+    if (!fine) return;
+    html.classList.remove('has-cursor');
+    cursor.classList.remove('is-label', 'is-down');
+    cursorTarget = null;
   });
   addEventListener('pointerdown', () => cursor.classList.add('is-down'));
   addEventListener('pointerup', () => cursor.classList.remove('is-down'));
@@ -928,7 +954,7 @@
   $('#soundBtn').addEventListener('click', () => Sound.set(!Sound.on));
 
   // ---------- smooth scroll ----------
-  const lenis = typeof window.Lenis === 'function'
+  const lenis = !reduce && typeof window.Lenis === 'function'
     ? new window.Lenis({
       duration: 1.3,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -949,8 +975,11 @@
     html.classList.toggle('menu-open', open);
     menuBtn.setAttribute('aria-expanded', String(open));
     menu.setAttribute('aria-hidden', String(!open));
+    menu.inert = !open;
     menuBtn.textContent = open ? 'Close' : 'Menu';
     if (lenis && S.entered) open ? lenis.stop() : lenis.start();
+    if (open) requestAnimationFrame(() => $('.menu-list a')?.focus());
+    else if (menu.contains(document.activeElement)) menuBtn.focus();
   }
   menuBtn.addEventListener('click', () => setMenu(!html.classList.contains('menu-open')));
   addEventListener('keydown', (e) => { if (e.key === 'Escape' && html.classList.contains('menu-open')) setMenu(false); });
@@ -977,7 +1006,218 @@
     if (lenis) lenis.scrollTo(y, { duration: clamp((dist / S.H) * 0.22, 1.2, 5), easing: easeInOut, force: true });
     else scrollTo({ top: y, behavior: reduce ? 'auto' : 'smooth' });
   }
+
+  // ---------- project, experience, achievement and skill details ----------
+  const detailDialog = $('#detailDialog');
+  const detailClose = $('#detailClose');
+  const detailEyebrow = $('#detailEyebrow');
+  const detailTitle = $('#detailTitle');
+  const detailSummary = $('#detailSummary');
+  const detailSections = $('#detailSections');
+  const detailLinks = $('#detailLinks');
+  let detailReturnFocus = null;
+
+  const DETAIL_DATA = {
+    project: {
+      opero: {
+        eyebrow: 'AI work-operator workflow', title: 'OPERO', accent: '#ffb23f',
+        summary: 'A workflow for turning natural-language intent into investigated, verified actions. The public OPERO repository documents a Phase 0 full-stack foundation.',
+        sections: [
+          ['Problem', 'Make natural-language work requests actionable through a governed workflow.'],
+          ['Solution', 'A web foundation with an operations dashboard and database-backed values. The documented workflow is Speak → Understand → Investigate → Decide → Act → Verify → Report.'],
+          ['Technology', 'Next.js 16, React 19, TypeScript, Tailwind CSS, Next.js API routes, Node.js, PostgreSQL and Prisma.'],
+          ['Key features', 'Dashboard, API routes and a Prisma-backed data foundation are documented in the repository.'],
+          ['Implementation details', 'The repository describes Phase 0 as complete and explicitly says voice integration is not implemented yet. A related desktop operator is documented in The-Opero.'],
+        ],
+        links: [
+          ['OPERO workflow foundation', 'https://github.com/channallikrishnasai/OPERO'],
+          ['Related desktop voice operator', 'https://github.com/channallikrishnasai/The-Opero'],
+        ],
+      },
+      facerex: {
+        eyebrow: 'Computer vision · mobile-oriented inference', title: 'FaceRex', accent: '#ff5a1e',
+        summary: 'A face-recognition application using computer vision and mobile-oriented inference.',
+        sections: [
+          ['Problem', 'Face-recognition workflows for a mobile-oriented application.'],
+          ['Solution', 'A computer-vision face-recognition application, as described in the supplied project information.'],
+          ['Technology', 'Project-specific technologies have not been provided.'],
+          ['Key features', 'A feature list was not available in the materials reviewed.'],
+          ['Implementation details', 'Mobile-oriented inference is noted; model, runtime and implementation details are not verified.'],
+        ], links: [],
+      },
+      vaultiq: {
+        eyebrow: 'AI-assisted personal finance', title: 'VaultIQ AI', accent: '#efe7da',
+        summary: 'A personal-finance application that brings budgeting, goals, investment planning, documents and scenario workflows together.',
+        sections: [
+          ['Problem', 'Keep personal-finance information and planning workflows together in one application.'],
+          ['Solution', 'An AI-assisted finance platform with dashboard modules for budgeting, expenses, goals, investments, documents and scenarios.'],
+          ['Technology', 'Next.js 16, React 19, TypeScript, Tailwind CSS 4, Prisma 7, SQLite and Supabase PostgreSQL.'],
+          ['Key features', 'The repository documents expense intelligence, financial goals, investment planning, document handling, and financial scenario tools.'],
+          ['Implementation details', 'Next.js App Router and API routes; Prisma-backed core data; Supabase PostgreSQL for chat storage; multiple documented AI provider integrations.'],
+        ],
+        links: [['GitHub repository', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+      },
+      infravision: {
+        eyebrow: 'AI · infrastructure image analysis', title: 'InfraVision', accent: '#8c8cff',
+        summary: 'An AI-based infrastructure damage-detection and image-analysis system.',
+        sections: [
+          ['Problem', 'Identify infrastructure damage from imagery.'],
+          ['Solution', 'An AI-based damage-detection and image-analysis system, as described in the supplied project information.'],
+          ['Technology', 'Project-specific technologies have not been provided.'],
+          ['Key features', 'A feature list was not available in the materials reviewed.'],
+          ['Implementation details', 'Model and implementation details are not verified.'],
+        ], links: [],
+      },
+      crisisflow: {
+        eyebrow: 'Emergency response · crisis management', title: 'CrisisFlow', accent: '#a8c99e',
+        summary: 'An emergency-response and crisis-management command system.',
+        sections: [
+          ['Problem', 'Coordinate emergency-response workflows during crises.'],
+          ['Solution', 'A crisis-management command system, as described in the supplied project information.'],
+          ['Technology', 'Project-specific technologies have not been provided.'],
+          ['Key features', 'A feature list was not available in the materials reviewed.'],
+          ['Implementation details', 'Implementation details are not verified.'],
+        ], links: [],
+      },
+    },
+    experience: {
+      codomax: {
+        eyebrow: 'Completed internship', title: 'Codomax Digital Solutions', accent: '#ffb23f',
+        summary: 'Full Stack Web Development Intern.',
+        sections: [
+          ['Company and role', 'Codomax Digital Solutions — Full Stack Web Development Intern.'],
+          ['Duration', 'Internship dates or duration were not provided.'],
+          ['Responsibilities', 'Specific responsibilities were not provided.'],
+          ['Certificate', 'Certificate ID CDM/CERT/945434, issued September 2026. No certificate file or verified viewing link is available in this project.'],
+        ], links: [],
+      },
+      stoxra: {
+        eyebrow: 'Completed internship', title: 'Stoxra', accent: '#8c8cff',
+        summary: 'A completed internship at Stoxra.',
+        sections: [
+          ['Company and role', 'Stoxra — internship completed. A specific role was not provided.'],
+          ['Duration', 'Dates or duration were not provided.'],
+          ['Responsibilities', 'Specific responsibilities were not provided.'],
+          ['Certificate', 'No certificate details or verified certificate link were provided.'],
+        ], links: [],
+      },
+    },
+    achievement: {
+      participation: {
+        eyebrow: 'Participation', title: 'Hackathons', accent: '#efe7da',
+        summary: 'Participated in approximately 19 hackathons.',
+        sections: [['Recognition', 'This records participation only; it does not claim a win or ranking.']], links: [],
+      },
+      paytm: {
+        eyebrow: 'Hackathon ranking', title: 'Paytm Hackathon', accent: '#ff5a1e',
+        summary: 'Selected among the Top 15 teams out of 2,000+ teams.',
+        sections: [['Recognition', 'The reported result is a Top 15 team selection. No additional award or win is claimed.']], links: [],
+      },
+    },
+  };
+
+  const SKILL_PROJECTS = {
+    'react': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'next.js': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'typescript': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'tailwind css': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'postgresql': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'prisma': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'javascript': [['Krishna Sai portfolio', '']],
+    'python': [['The-Opero (related desktop operator)', 'https://github.com/channallikrishnasai/The-Opero']],
+    'supabase': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'computer vision': [['FaceRex (project description supplied; source link not provided)', '']],
+    'face recognition': [['FaceRex (project description supplied; source link not provided)', '']],
+    'ai application development': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['The-Opero (related desktop operator)', 'https://github.com/channallikrishnasai/The-Opero']],
+    'three.js': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'react three fiber': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+    'framer motion': [['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
+  };
+
+  function skillDetail(name) {
+    const matches = SKILL_PROJECTS[name.toLowerCase()] || [];
+    const sections = matches.length
+      ? [['Verified project use', matches.map(([project]) => project).join(' · ') + '. Project-specific stack details are linked below where a public repository is available.']]
+      : [['Verified project use', 'No project-specific use is documented in the available materials for the featured projects, so this skill has not been assigned to a project.']];
+    return {
+      eyebrow: 'Technical skill', title: name, accent: '#ffb23f',
+      summary: 'Project connections are shown only when the available project documentation supports them.',
+      sections,
+      links: matches.filter(([, url]) => url).map(([project, url]) => [project + ' repository', url]),
+    };
+  }
+
+  function renderDetail(detail, trigger) {
+    detailEyebrow.textContent = detail.eyebrow;
+    detailTitle.textContent = detail.title;
+    detailSummary.textContent = detail.summary;
+    detailDialog.style.setProperty('--detail-accent', detail.accent || '#ffb23f');
+    detailSections.replaceChildren();
+    detail.sections.forEach(([heading, body]) => {
+      const section = document.createElement('section');
+      section.className = 'detail-section';
+      const h = document.createElement('h3');
+      h.textContent = heading;
+      section.appendChild(h);
+      if (heading === 'Technology' && !/not provided|not been provided/i.test(body)) {
+        const tags = document.createElement('ul');
+        tags.className = 'detail-tags';
+        body.replace(/\.$/, '').split(/,\s*/).forEach((technology) => {
+          const tag = document.createElement('li');
+          tag.textContent = technology;
+          tags.appendChild(tag);
+        });
+        section.appendChild(tags);
+      } else {
+        const p = document.createElement('p');
+        p.textContent = body;
+        section.appendChild(p);
+      }
+      detailSections.appendChild(section);
+    });
+    detailLinks.replaceChildren();
+    if (detail.links.length) {
+      detail.links.forEach(([label, href]) => {
+        const link = document.createElement('a');
+        link.className = 'detail-link';
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        link.textContent = label + ' ↗';
+        detailLinks.appendChild(link);
+      });
+    } else {
+      const note = document.createElement('p');
+      note.className = 'detail-no-links';
+      note.textContent = 'No verified repository, certificate file or live demo link is available for this item.';
+      detailLinks.appendChild(note);
+    }
+    detailReturnFocus = trigger;
+    if (lenis) lenis.stop();
+    if (!detailDialog.open) detailDialog.showModal();
+    requestAnimationFrame(() => detailClose.focus());
+  }
+
+  function openDetail(trigger) {
+    const value = trigger.dataset.detail || '';
+    const split = value.indexOf(':');
+    const kind = value.slice(0, split);
+    const key = value.slice(split + 1);
+    const detail = kind === 'skill' ? skillDetail(key) : DETAIL_DATA[kind]?.[key];
+    if (detail) renderDetail(detail, trigger);
+  }
+
+  detailClose.addEventListener('click', () => detailDialog.close());
+  detailDialog.addEventListener('close', () => {
+    if (lenis && S.entered && !html.classList.contains('menu-open')) lenis.start();
+    if (detailReturnFocus?.isConnected) detailReturnFocus.focus();
+  });
+  detailDialog.addEventListener('click', (e) => { if (e.target === detailDialog) detailDialog.close(); });
+
   document.addEventListener('click', (e) => {
+    const detailTrigger = e.target.closest('[data-detail]');
+    if (detailTrigger) { openDetail(detailTrigger); return; }
+    if (e.target.closest('#copyEmail')) { copyEmail(); return; }
     const go = e.target.closest('[data-go]');
     const a = e.target.closest('[data-jump]');
     if (!go && !a) return;
@@ -988,20 +1228,56 @@
       jump(/^\d+$/.test(g) ? 'case:' + g : g);
     } else jump(a.dataset.jump);
   });
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat || !['Enter', ' '].includes(e.key)) return;
+    const card = e.target.closest?.('.screen[data-detail]');
+    if (card) { e.preventDefault(); openDetail(card); }
+  });
 
   // copy email
   const copyBtn = $('#copyEmail');
-  copyBtn.addEventListener('click', async () => {
+  const copyFeedback = $('#copyFeedback');
+  let copyResetTimer = 0;
+  async function copyEmail() {
     const email = copyBtn.dataset.email;
-    try { await navigator.clipboard.writeText(email); copyBtn.textContent = 'Copied'; }
-    catch { copyBtn.textContent = email; }
-    setTimeout(() => { copyBtn.textContent = 'Copy email'; }, 2200);
-  });
+    let copied = false;
+    copyBtn.textContent = 'Copying…';
+    copyFeedback.textContent = 'Copying email address…';
+    try {
+      if (navigator.clipboard?.writeText) {
+        let timeoutId;
+        const result = await Promise.race([
+          navigator.clipboard.writeText(email).then(() => true),
+          new Promise((resolve) => { timeoutId = setTimeout(() => resolve(false), 800); }),
+        ]);
+        clearTimeout(timeoutId);
+        copied = result === true;
+      }
+    } catch {}
+    if (!copied) {
+      const field = document.createElement('textarea');
+      field.value = email;
+      field.setAttribute('readonly', '');
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.appendChild(field);
+      field.select();
+      try { copied = document.execCommand('copy'); } catch {}
+      field.remove();
+    }
+    copyBtn.textContent = copied ? 'Copied!' : 'Copy unavailable';
+    copyFeedback.textContent = copied ? 'Email address copied to clipboard.' : 'Could not copy automatically. Select the email address shown in Contact.';
+    clearTimeout(copyResetTimer);
+    copyResetTimer = setTimeout(() => {
+      copyBtn.textContent = 'Copy email';
+      copyFeedback.textContent = '';
+    }, 2600);
+  }
 
-  // Lisbon clock
+  // Bengaluru local clock
   const clock = $('#clock');
   const tick = () => {
-    try { clock.textContent = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Lisbon' }).format(new Date()); }
+    try { clock.textContent = new Intl.DateTimeFormat('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Kolkata' }).format(new Date()); }
     catch { clock.textContent = new Date().toTimeString().slice(0, 5); }
   };
   tick(); setInterval(tick, 15000);
@@ -1009,13 +1285,19 @@
   // ---------- loader + enter ----------
   const loader = $('#loader');
   const loadPct = $('#loadPct'), loadFill = $('#loadFill');
+  const loadStatus = $('.loader-status');
   $$('.hn').forEach((el, i) => { el.style.transitionDelay = `${0.25 + i * 0.055}s`; });
 
   function enter(withSound) {
     if (S.entered) return;
     S.entered = true;
+    if (fine) html.classList.add('has-cursor');
     if (withSound) Sound.set(true);
+    $('header.nav').inert = false;
+    menu.inert = true;
+    $('#top').inert = false;
     loader.classList.add('is-out');
+    loader.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('is-locked');
     html.classList.add('is-entered');
     if (lenis) lenis.start();
@@ -1024,9 +1306,10 @@
   }
   $$('[data-enter]').forEach((b) => b.addEventListener('click', () => enter(b.dataset.enter === 'sound')));
 
-  fall.load(8, (r) => {
+  fall.load(compactMemory ? 4 : 8, (r) => {
     const v = Math.round(r * 100);
     loadPct.textContent = v;
+    loadStatus.setAttribute('aria-valuenow', String(v));
     loadFill.style.height = v + '%';
   }).then(() => {
     loader.classList.add('is-ready');
@@ -1042,9 +1325,11 @@
   addEventListener('load', measure);
 
   let last = performance.now();
+  let rafId = 0;
   function loop(now) {
-    requestAnimationFrame(loop);
+    rafId = 0;
     step(now);
+    if (!document.hidden) rafId = requestAnimationFrame(loop);
   }
   function step(now) {
     const dt = Math.min(64, now - last);
@@ -1054,6 +1339,7 @@
     S.vel = lerp(S.vel, y - S.y, 0.3);
     S.y = y;
     S.t = now / 1000;
+    if (!S.entered) return;
     if (!fine) { S.mx = Math.sin(S.t * 0.4) * 0.35; S.my = Math.cos(S.t * 0.3) * 0.25; }
     S.smx = lerp(S.smx, S.mx, 0.06);
     S.smy = lerp(S.smy, S.my, 0.06);
@@ -1068,5 +1354,17 @@
     updateCursor();
     Sound.update();
   }
-  requestAnimationFrame(loop);
+  function startLoop() {
+    if (!rafId && !document.hidden) rafId = requestAnimationFrame(loop);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = 0;
+    } else {
+      last = performance.now();
+      startLoop();
+    }
+  });
+  startLoop();
 })();

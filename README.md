@@ -1,65 +1,88 @@
-# Krishna Sai — Personal Portfolio
+# Krishna Sai Channalli — Developer Portfolio
 
-A single-page, scroll-driven portfolio based on Freefall. It keeps the original falling sequence and story, with a custom 240-frame portal walk-out at the end.
+A single-page portfolio for Krishna Sai Channalli, a Computer Science Engineering student at RNS Institute of Technology in Bengaluru. It presents full-stack, AI and interactive software projects through Freefall's original scroll-driven visual story.
+
+## Profile
+
+- **Positioning:** Computer Science Engineering Student · Full-Stack Developer · AI Builder
+- **Education:** B.E. Computer Science and Engineering, RNS Institute of Technology, Bengaluru; expected 2029
+- **Location:** Bengaluru, India
+- **GitHub:** <https://github.com/channallikrishnasai>
+- **LinkedIn:** <https://www.linkedin.com/in/krishna-sai-channalli-4528262b3>
 
 ## Features
 
-- Full-page portfolio story with a pinned, scroll-driven opening sequence.
-- Original falling-film frames, impact transition, crowd/rise sequence, selected work, about, services, portal and contact sections.
-- Custom portal animation made from 240 sequential JPEG frames at 1280×720 (16:9, 24 fps). The frame follows scroll position in both directions and holds while scrolling is stopped.
-- Canvas rendering synchronized through `requestAnimationFrame`.
-- Progressive frame loading with two requests in flight, a 12-frame decoded-image cache, first/last-frame retention and an original-film fallback.
-- Reduced-motion mode holds the portal on its final frame.
-- Responsive layout and smooth scrolling through Lenis.
+- Original Freefall falling, impact, rise and portfolio story.
+- Five project cards for OPERO, FaceRex, VaultIQ AI, InfraVision and CrisisFlow.
+- Scroll-controlled, 240-frame portal walk-out animation, scrubbed in both directions and rendered through canvas with `requestAnimationFrame`.
+- Progressive image loading, bounded decoded-frame caches for both image sequences, a lower memory budget on mobile, and a fallback frame for the portal sequence.
+- Education, completed internship experience, hackathon participation and a categorized skills list.
+- Keyboard-accessible project, internship, achievement and technology detail dialogs, with repository links only where a public source is available.
+- Project-linked skills based on documented repository information; unverified project stacks, duties and dates are identified as unavailable rather than inferred.
+- Navigation menu with active-section indication, external links that open safely, and copy-email feedback.
+- Responsive layout, keyboard-accessible navigation, Lenis scrolling when motion is allowed, and a render loop that pauses while the page is hidden.
+
+## Interactive portfolio details
+
+Project cards open a detail dialog with overview, problem, solution, technology, features and implementation notes. FaceRex, InfraVision and CrisisFlow have no verified source links or detailed stack information in the available materials, so their dialogs state those gaps. OPERO and VaultIQ AI link to their documented GitHub repositories. The related The-Opero repository is labeled separately from OPERO.
+
+Internship and achievement cards open detail dialogs. The Codomax role and certificate identifier/date are shown as supplied, but no certificate file or verified destination is available. Stoxra has no supplied role, date or responsibility details. Hackathon participation is separate from the reported Paytm Top 15 selection.
+
+Selecting a skill opens documented project connections when available. The interface does not assign proficiency scores. The menu scrolls to the corresponding section and marks the current chapter; its Escape key closes it. Dialogs can be dismissed with Escape or their close control, return focus to the opening control, and pause smooth scrolling while open. The contact section provides email, GitHub and LinkedIn links and a copy-email button with status feedback.
+
+## Projects and source links
+
+- **OPERO:** The public [OPERO repository](https://github.com/channallikrishnasai/OPERO) describes a request → investigate → decide → act → verify workflow and a Phase 0 full-stack foundation; its README says voice integration is not implemented yet. The related [The-Opero desktop operator](https://github.com/channallikrishnasai/The-Opero) documents Python, PyQt6, Gemini, voice and screen context, and action modules.
+- **FaceRex:** Computer-vision face-recognition application with mobile-oriented inference. Project-specific stack and a public source or demo link have not been supplied.
+- **VaultIQ AI:** AI-assisted personal-finance application covering budgeting, goals, investment planning, documents and scenario workflows. Its [public repository](https://github.com/channallikrishnasai/vaultiq-ai) documents Next.js, TypeScript, Prisma, Tailwind CSS, SQLite and Supabase PostgreSQL.
+- **InfraVision:** AI-based infrastructure damage detection and image analysis. Project-specific stack and a public source or demo link have not been supplied.
+- **CrisisFlow:** Emergency-response and crisis-management command system. Project-specific stack and a public source or demo link have not been supplied.
+
+Project details in the portfolio are limited to information supplied by Krishna or described in these public repositories. No unverified demos, performance figures or project links are claimed.
+
+## Experience and achievements
+
+- **Codomax Digital Solutions:** Full Stack Web Development Intern. Certificate CDM/CERT/945434, issued September 2026.
+- **Stoxra:** Completed internship; role and dates were not provided.
+- Participated in approximately 19 hackathons.
+- At the Paytm hackathon, selected among the Top 15 teams out of 2,000+ teams.
 
 ## Technology
 
-- HTML, CSS and vanilla JavaScript
-- Canvas 2D rendering and `requestAnimationFrame`
-- Lenis 1.1.13 and Google Fonts loaded from their CDNs
-- Python's built-in static HTTP server for local development; no build step or package installation is required
+- **Site:** HTML, CSS and vanilla JavaScript
+- **Animation:** Canvas 2D, `requestAnimationFrame`, scroll-driven image sequences
+- **Scrolling:** Lenis 1.1.13
+- **Fonts:** Archivo and Instrument Serif from Google Fonts
+- **Portfolio skills:** React, Next.js, TypeScript, JavaScript, Tailwind CSS, Python, FastAPI, PostgreSQL, Prisma, Redis, Supabase, ONNX, computer vision, Git, GitHub, Docker, Expo, Three.js, React Three Fiber and Framer Motion
+
+The page is static and has no build step or npm dependencies. Lenis and the fonts are loaded from CDNs.
 
 ## Scroll-controlled portal animation
 
-The portal section maps normalized section scroll progress from 2% through 76% to frames 1 through 240. The selected frame is rounded to the nearest source frame. Scrolling upward reverses the sequence. In reduced-motion mode, the final frame is shown statically.
+The portal section maps normalized scroll progress from 2% through 76% to frames 1 through 240. The selected frame is rounded to the nearest source frame, so scrolling upward reverses the sequence and stopping holds the selected frame. In reduced-motion mode, the final frame is shown statically and navigation jumps do not use Lenis animation.
 
-The source frames are stored without modification in `assets/portal-scroll/` as `frame_0001.jpg` through `frame_0240.jpg`. The original Freefall sequences remain in `assets/fall/` and `assets/portal/` for the main story and existing page imagery.
+The original 240 JPEGs are kept unchanged in `assets/portal-scroll/` as `frame_0001.jpg` through `frame_0240.jpg`. The original Freefall sequences remain in `assets/fall/` and `assets/portal/` for the opening story and ambient project-card artwork.
 
-## Installation
-
-Clone the repository, then enter its directory:
+## Run locally
 
 ```bash
-git clone https://github.com/channallikrishnasai/krishna-sai-portfolio.git
-cd krishna-sai-portfolio
-```
-
-There are no npm dependencies to install. The page loads its fonts and Lenis from CDNs, so those resources need an internet connection.
-
-## Local development
-
-Run a static server from the repository root:
-
-```bash
+git clone https://github.com/channallikrishnasai/Krishna-Sai-Channalli-portfolio.git
+cd Krishna-Sai-Channalli-portfolio
 python -m http.server 8000
 ```
 
-Open <http://localhost:8000>. `py -m http.server 8000` can be used on Windows where the launcher is available. Directly opening `index.html` may work, but the local server is more reliable for browser asset loading.
+Open <http://localhost:8000>. On Windows, `py -m http.server 8000` may be used. Directly opening `index.html` may work, but a local server is more reliable for image loading. No package installation is required.
 
-## Deployment
+## Deploy
 
-This is a static site. It can be deployed from the repository root to GitHub Pages or another static host without a build command:
-
-1. Select the `main` branch and repository root as the Pages source (or the equivalent root-directory setting on another host).
-2. Publish the site and open the host-provided URL.
-3. Confirm the relative `assets/`, `css/` and `js/` paths are served unchanged.
+This is a static website. Configure GitHub Pages or another static host to publish the repository root from the `main` branch. No build command is needed. Keep the relative `assets/`, `css/` and `js/` paths intact.
 
 ## Credits and attribution
 
-The original Freefall portfolio was created by Gireesh Kumar Reddy: <https://github.com/gireeshkumarreddy/freefall-portfolio>. This repository includes a customized version of that work and preserves its original experience and assets, with the additional 240-frame portal sequence supplied for this portfolio.
+The original Freefall portfolio was created by [Gireesh Kumar Reddy](https://github.com/gireeshkumarreddy/freefall-portfolio). This customized project retains its visual system, animation architecture and source assets, with the additional 240-frame portal sequence supplied for this portfolio.
 
-The upstream repository did not include a `LICENSE` file when checked. Redistribution is based on separate authorization from the rights holder; the source project is credited above. No new license is asserted for third-party material.
+The upstream GitHub repository currently has no `LICENSE` file, and its README does not state redistribution terms. This project therefore cannot establish permission to redistribute the original code or assets. Attribution is retained, but permission remains unverified and should be confirmed directly with the rights holder before public redistribution. No new license is asserted for third-party material.
 
-## Before publishing your personal details
+## Search and sharing metadata
 
-The original page copy still contains the template name, sample case studies and contact details. Update those in `index.html` before presenting the site as a finished personal portfolio.
+The page includes a descriptive title and summary, robots directive, SVG favicon, and Open Graph/Twitter preview metadata. The preview uses the final frame already present in the public repository. No canonical URL is declared because a deployed production domain has not been confirmed. Public redistribution of the original Freefall assets remains unverified; see Credits and attribution.
