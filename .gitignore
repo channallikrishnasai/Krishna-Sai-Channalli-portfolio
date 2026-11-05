@@ -1,0 +1,27 @@
+# Operating-system files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors and local tooling
+.vscode/
+.idea/
+.claude/
+
+# Local secrets and environment files
+.env
+.env.*
+!.env.example
+
+# Generated or installed files
+node_modules/
+dist/
+build/
+.cache/
+*.log
+
+# Optional showcase render output (not required to run the site)
+showcase/screen.mp4
+showcase/score.wav
+showcase/_seg*
+__pycache__/
