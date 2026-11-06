@@ -1,92 +1,104 @@
 # Krishna Sai Channalli — Developer Portfolio
 
-A single-page portfolio for Krishna Sai Channalli, a Computer Science Engineering student at RNS Institute of Technology in Bengaluru. It presents full-stack, AI and interactive software projects through Freefall's original scroll-driven visual story.
+**Full-stack web developer · Computer Science Engineering student · Bengaluru, India**
 
-## Profile
+A cinematic, scroll-driven portfolio presenting Krishna Sai’s projects, engineering interests, experience, and credentials. The site pairs an interactive visual story with practical project details, evidence-linked skills, and direct contact links.
 
-- **Positioning:** Computer Science Engineering Student · Full-Stack Developer · AI Builder
-- **Education:** B.E. Computer Science and Engineering, RNS Institute of Technology, Bengaluru; expected 2029
-- **Location:** Bengaluru, India
-- **GitHub:** <https://github.com/channallikrishnasai>
-- **LinkedIn:** <https://www.linkedin.com/in/krishna-sai-channalli-4528262b3>
+**Live site:** [channallikrishnasai.github.io/Krishna-Sai-Channalli-portfolio](https://channallikrishnasai.github.io/Krishna-Sai-Channalli-portfolio/)
 
-## Features
+**GitHub:** [channallikrishnasai](https://github.com/channallikrishnasai) · **LinkedIn:** [Krishna Sai Channalli](https://www.linkedin.com/in/krishna-sai-channalli-4528262b3)
 
-- Original Freefall falling, impact, rise and portfolio story.
-- Five project cards for OPERO, VaultIQ AI, InfraVision, ODIN and FaceRex, each with a project-specific interactive flow visual.
-- Scroll-controlled, 240-frame portal walk-out animation, scrubbed in both directions and rendered through canvas with `requestAnimationFrame`.
-- Progressive image loading, bounded decoded-frame caches for both image sequences, a lower memory budget on mobile, and a fallback frame for the portal sequence.
-- Education, completed internship experience, hackathon participation and a categorized skills list with additional ODIN Android and on-device AI technologies.
-- Cinematic internship timeline panels with verified Codomax details and clearly marked missing Stoxra information.
-- Technology groups revealed on scroll, with restrained amber hover lighting and repository-backed project links.
-- Keyboard-accessible project, internship, achievement and technology detail dialogs, with repository links only where a public source is available.
-- Project-linked skills based on documented repository information; unverified project stacks, duties and dates are identified as unavailable rather than inferred.
-- Navigation menu with active-section indication, external links that open safely, and copy-email feedback.
-- Responsive layout, keyboard-accessible navigation, Lenis scrolling when motion is allowed, and a render loop that pauses while the page is hidden.
+## What’s here
 
-## Interactive portfolio details
+- A single-page portfolio built with HTML, CSS, and vanilla JavaScript.
+- A cinematic opening story, animated profile scene, project index, experience archive, achievements, technical skills, and contact section.
+- Five featured projects: OPERO, Proofline, VaultIQ AI, InfraVision, and ODIN.
+- Interactive project, experience, achievement, and skill details, including flow diagrams and certificate or document previews where available.
+- A 240-frame portal sequence controlled by page scroll. It scrubs in either direction, holds its selected frame when scrolling stops, and does not autoplay.
+- Progressive frame loading, two concurrent image loads, bounded decoded-image caches, a fallback frame, and smaller cache limits on mobile.
+- Responsive layouts, keyboard-accessible controls, reduced-motion support, and safe external links.
+- Email, GitHub, LinkedIn, and phone contact actions, including copy-email feedback.
 
-Project cards open a detail dialog with overview, problem, solution, technology, features and implementation notes. Each project dialog includes an interactive flow or architecture visual. OPERO, VaultIQ AI and ODIN link to their documented GitHub repositories. FaceRex and InfraVision flows are explicitly illustrative because implementation details and public source links were not available. The related The-Opero repository is labeled separately from OPERO.
+## Featured work
 
-Internship and achievement cards open detail dialogs. The Codomax role and certificate identifier/date are shown as supplied, but no certificate file or verified destination is available. Stoxra has no supplied role, date or responsibility details. Hackathon participation is separate from the reported Paytm Top 15 selection.
+| Project | Focus | Source |
+| --- | --- | --- |
+| **OPERO** | Full-stack foundation for a governed workflow from request through verification. | [GitHub](https://github.com/channallikrishnasai/OPERO) |
+| **Proofline** | Open-source digital forensics and incident response for investigating AI-agent activity. | [GitHub](https://github.com/channallikrishnasai/proofline) |
+| **VaultIQ AI** | Personal-finance workflows for budgeting, goals, investment planning, documents, and scenarios. | [GitHub](https://github.com/channallikrishnasai/vaultiq-ai) |
+| **InfraVision** | Infrastructure image analysis. The portfolio limits details to the available project material. | No verified public source link is listed. |
+| **ODIN** | Local-first Android assistant with configurable assistant and device-provider integrations. | [GitHub](https://github.com/channallikrishnasai/odin-android) |
 
-Selecting a skill opens documented project connections when available. The interface does not assign proficiency scores. The menu scrolls to the corresponding section and marks the current chapter; its Escape key closes it. Dialogs can be dismissed with Escape or their close control, return focus to the opening control, and allow vertical scrolling inside the detail dialog. The contact section provides email, GitHub and LinkedIn links and a copy-email button with status feedback.
+The Paytm Hackathon detail describes **ArthiX**, the business workspace built for that event, and links to its [public repository](https://github.com/channallikrishnasai/ArthiX). It separates the reported Top 15 selection from the project’s implementation details. The project flow is explanatory and does not claim every documented feature was enabled in the event demo.
 
-## Projects and source links
+Project stacks and capabilities are described from the linked repositories or supplied project materials. Where a public source or implementation detail is unavailable, the portfolio says so rather than presenting an illustrative flow as verified functionality.
 
-- **OPERO:** The public [OPERO repository](https://github.com/channallikrishnasai/OPERO) describes a request → investigate → decide → act → verify workflow and a Phase 0 full-stack foundation; its README says voice integration is not implemented yet. The related [The-Opero desktop operator](https://github.com/channallikrishnasai/The-Opero) documents Python, PyQt6, Gemini, voice and screen context, and action modules.
-- **VaultIQ AI:** AI-assisted personal-finance application covering budgeting, goals, investment planning, documents and scenario workflows. Its [public repository](https://github.com/channallikrishnasai/vaultiq-ai) documents Next.js, TypeScript, Prisma, Tailwind CSS, SQLite and Supabase PostgreSQL.
-- **InfraVision:** AI-based infrastructure damage detection and image analysis. Project-specific stack and a public source or demo link have not been supplied.
-- **ODIN:** A local-first Android assistant. Its [public repository](https://github.com/channallikrishnasai/odin-android) documents Kotlin, Jetpack Compose, Material 3, Hilt, Room, local/remote assistant providers, speech and OCR paths, and configurable smart-home provider boundaries. Model assets, permissions and device setup are required for relevant features; target-device validation remains necessary.
-- **FaceRex:** Computer-vision face-recognition application with mobile-oriented inference. Project-specific stack and a public source or demo link have not been supplied. Its flow visual is illustrative.
+## Experience and credentials
 
-Project details in the portfolio are limited to information supplied by Krishna or described in these public repositories. No unverified demos, performance figures or project links are claimed.
-
-## Experience and achievements
-
-- **Codomax Digital Solutions:** Full Stack Web Development Intern. Certificate CDM/CERT/945434, issued September 2026.
-- **Stoxra:** Completed internship; role and dates were not provided.
-- Participated in approximately 19 hackathons.
-- At the Paytm hackathon, selected among the Top 15 teams out of 2,000+ teams.
+- **Codomax Digital Solutions — Full Stack Web Development Intern.** The detail panel previews the completion certificate and letter of recommendation. The internship duration was not supplied.
+- **Stoxra Technologies — SEO & Web Development Intern.** The completion certificate records the Growth and Business Development program and the dates **20 August–20 October 2026**; the portfolio also previews the certificate.
+- **Google Gemini Student Ambassador.** Presented as a campus ambassador experience; no certificate or external program document is linked.
+- Achievement details distinguish the Paytm Top 15 selection, the Inventra Best Project award, builder recognition, hackathon participation certificates, and learning records. Participation is not presented as a ranking or win.
 
 ## Technology
 
-- **Site:** HTML, CSS and vanilla JavaScript
-- **Animation:** Canvas 2D, `requestAnimationFrame`, scroll-driven image sequences
-- **Scrolling:** Lenis 1.1.13
-- **Fonts:** Archivo and Instrument Serif from Google Fonts
-- **Portfolio technology groups:** React, Next.js, TypeScript, JavaScript, HTML5, CSS3, Tailwind CSS; Python, FastAPI, Node.js, PostgreSQL, Prisma, Redis, Supabase, REST APIs; ONNX, OpenCV, ML Kit OCR, computer vision, face recognition and AI application development; Kotlin, Android, Jetpack Compose, Material 3, Hilt, Room, DataStore, OkHttp, LiteRT-LM, MediaPipe, Vosk, MQTT and configurable smart-home provider integrations; Three.js, React Three Fiber and Framer Motion; Git, GitHub and Docker.
+The site itself uses **HTML, CSS, and vanilla JavaScript**, with Canvas 2D and `requestAnimationFrame` for the cinematic sequences. Lenis provides smooth scrolling when motion is allowed. Archivo and Instrument Serif load from Google Fonts. There is no build step or npm dependency installation.
 
-Technology chips link to projects only where a public repository manifest, source file or project documentation supports the connection. The expanded Android stack reflects ODIN repository dependencies; Whisper is marked explored because a verified use in the featured ODIN implementation was not established. The FaceRex description was supplied, but no public source was available, so no model or inference runtime is claimed. React Native, Expo, standalone WebGL, MobileFaceNet, BlazeFace, MiniFASNet and Linux were not listed because the reviewed project sources did not verify them. ODIN is listed as native Kotlin/Android work.
+The portfolio’s technology groups include the following areas. Project-specific connections are shown only where the available repository or project information supports them; the skill list also includes technologies supplied by Krishna Sai.
 
-The page is static and has no build step or npm dependencies. Lenis and the fonts are loaded from CDNs.
+- **Languages:** Python, JavaScript, TypeScript, Go, Kotlin, SQL, C, and C++.
+- **Web and application development:** React, Next.js, React Native, Expo, Node.js, FastAPI, REST APIs, WebSockets, HTML5, CSS3, Tailwind CSS, Framer Motion, Three.js, and React Three Fiber.
+- **Data and infrastructure:** PostgreSQL, Prisma, SQLite, Redis, Supabase, Docker, Linux, Git, and GitHub.
+- **AI and agent systems:** AI/ML, generative AI, LLMs, AI agents, multi-agent systems, voice AI, AssemblyAI, agent tool calling, workflow orchestration, tool-permission systems, and human-in-the-loop systems.
+- **Computer vision and automation:** ONNX, OpenCV, MobileFaceNet, BlazeFace, MiniFASNet, face recognition, image analysis, ML Kit OCR, browser automation, and Playwright.
+- **Engineering areas:** full-stack, frontend, backend, mobile-app, and AI-application development; API integration and automation.
 
-## Scroll-controlled portal animation
+## Scroll-controlled portal
 
-The portal section maps normalized scroll progress from 2% through 76% to frames 1 through 240. The selected frame is rounded to the nearest source frame, so scrolling upward reverses the sequence and stopping holds the selected frame. In reduced-motion mode, the final frame is shown statically and navigation jumps do not use Lenis animation.
+The source sequence contains `frame_0001.jpg` through `frame_0240.jpg` in `assets/portal-scroll/`. Scroll progress selects a corresponding frame; moving upward reverses the sequence, and stopping holds the selected frame. Frames are drawn to canvas with `requestAnimationFrame` while preserving their proportions. Images load progressively, only two are requested concurrently, and the decoded-image cache is capped at 12 frames on desktop and 6 on mobile. If a source frame fails, the portal has a fallback image. With reduced motion enabled, the sequence uses a static final frame.
 
-The original 240 JPEGs are kept unchanged in `assets/portal-scroll/` as `frame_0001.jpg` through `frame_0240.jpg`. The original Freefall sequences remain in `assets/fall/` and `assets/portal/` for the opening story and ambient project-card artwork.
+The original source frames are kept unchanged. The separate opening-story sequences are stored in `assets/fall/` and `assets/portal/`.
 
 ## Run locally
 
+You need Python 3 for the simplest local server. From the repository directory, run:
+
 ```bash
-git clone https://github.com/channallikrishnasai/Krishna-Sai-Channalli-portfolio.git
-cd Krishna-Sai-Channalli-portfolio
 python -m http.server 8000
 ```
 
-Open <http://localhost:8000>. On Windows, `py -m http.server 8000` may be used. Directly opening `index.html` may work, but a local server is more reliable for image loading. No package installation is required.
+On Windows, this also works:
 
-## Deploy
+```powershell
+py -m http.server 8000
+```
 
-This is a static website. Configure GitHub Pages or another static host to publish the repository root from the `main` branch. No build command is needed. Keep the relative `assets/`, `css/` and `js/` paths intact.
+Then open [http://localhost:8000](http://localhost:8000). No package installation or build command is required. Serving the files over HTTP is more reliable than opening `index.html` directly, especially for the image sequences.
 
-## Credits and attribution
+## Deployment
 
-The original Freefall portfolio was created by [Gireesh Kumar Reddy](https://github.com/gireeshkumarreddy/freefall-portfolio). This customized project retains its visual system, animation architecture and source assets, with the additional 240-frame portal sequence supplied for this portfolio.
+GitHub Pages is configured to publish the repository root from the `main` branch. Push updates to `main` to publish the latest static files. The public site is [here](https://channallikrishnasai.github.io/Krishna-Sai-Channalli-portfolio/). Keep the relative `assets/`, `css/`, and `js/` paths intact.
 
-The upstream GitHub repository currently has no `LICENSE` file, and its README does not state redistribution terms. This project therefore cannot establish permission to redistribute the original code or assets. Attribution is retained, but permission remains unverified and should be confirmed directly with the rights holder before public redistribution. No new license is asserted for third-party material.
+## Project structure
 
-## Search and sharing metadata
+```text
+index.html                 Page structure and content
+css/style.css              Layout, responsive styles, and visual effects
+js/main.js                 Scroll, canvas, animation, and interaction logic
+assets/portal-scroll/      240 user-supplied portal frames
+assets/portfolio-scenes/   Five portrait project visuals
+assets/certificates/       Certificate and recommendation previews/documents
+assets/project-documents/  ArthiX overview document and page previews
+assets/fall/, assets/portal/ Original story and ambient image sequences
+```
 
-The page includes a descriptive title and summary, robots directive, SVG favicon, and Open Graph/Twitter preview metadata. The preview uses the final frame already present in the public repository. No canonical URL is declared because a deployed production domain has not been confirmed. Public redistribution of the original Freefall assets remains unverified; see Credits and attribution.
+## Contact
+
+- Email: [channallikrishnasai@gmail.com](mailto:channallikrishnasai@gmail.com)
+- Phone: [+91 90081 36500](tel:+919008136500)
+- GitHub: [github.com/channallikrishnasai](https://github.com/channallikrishnasai)
+- LinkedIn: [linkedin.com/in/krishna-sai-channalli-4528262b3](https://www.linkedin.com/in/krishna-sai-channalli-4528262b3)
+
+## Asset and reuse note
+
+The visual system, page structure, animation architecture, and some image sequences derive from the [original portfolio template repository](https://github.com/gireeshkumarreddy/freefall-portfolio) by Gireesh Kumar Reddy; attribution is retained here. The upstream repository has no visible license file, so redistribution terms for those original materials have not been established. This project does not claim a license for third-party material.
