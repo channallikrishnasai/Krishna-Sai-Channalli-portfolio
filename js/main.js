@@ -286,7 +286,7 @@
   const WORLD = {
     fall: {
       back: [
-        ['Freefall', 'xl ghost'], ['trust the drop', 'serif'], ['CSE student', 'tag'], ['Let go', 'xl'],
+        ['Build', 'xl ghost'], ['trust the drop', 'serif'], ['CSE student', 'tag'], ['Let go', 'xl'],
         ['ideas in motion', 'serif molten'], ['Gravity', 'l ghost molten'], ['Software engineering', 'tag'],
         ['No net', 'xl molten'], ['curiosity first', 'serif'], ['AI & full-stack', 'tag'], ['Light', 'l ghost'],
       ],
@@ -483,12 +483,17 @@
   });
 
   const aboutShowcase = $('#aboutShowcase');
-  if (aboutShowcase && !reduce && 'IntersectionObserver' in window) {
+  const educationFeature = $('.education-feature');
+  if (!reduce && 'IntersectionObserver' in window) {
     const aboutMotionObserver = new IntersectionObserver((entries) => {
-      for (const entry of entries) aboutShowcase.classList.toggle('is-active', entry.isIntersecting);
+      for (const entry of entries) entry.target.classList.toggle('is-active', entry.isIntersecting);
     }, { rootMargin: '120px 0px', threshold: 0 });
-    aboutMotionObserver.observe(aboutShowcase);
-  } else if (aboutShowcase && !reduce) aboutShowcase.classList.add('is-active');
+    if (aboutShowcase) aboutMotionObserver.observe(aboutShowcase);
+    if (educationFeature) aboutMotionObserver.observe(educationFeature);
+  } else if (!reduce) {
+    aboutShowcase?.classList.add('is-active');
+    educationFeature?.classList.add('is-active');
+  }
 
   // ---------- marquee ----------
   const marquees = $$('.marquee-row').map((row) => {
@@ -816,7 +821,7 @@
     const N = words.length;
     const head = m * (N + 5);
     for (let i = 0; i < N; i++) {
-      const o = Math.round(lerp(0.13, 1, clamp((head - i) / 5)) * 50) / 50;
+      const o = Math.round(lerp(0.76, 1, clamp((head - i) / 5)) * 50) / 50;
       if (o !== words[i].o) { words[i].o = o; words[i].el.style.opacity = o; }
     }
   }
@@ -925,7 +930,7 @@
     const total = document.documentElement.scrollHeight - S.H;
     const pct = clamp(S.y / total);
     let read;
-    if (ch <= 1) read = 'In freefall';
+    if (ch <= 1) read = 'In motion';
     else if (ch <= 3) read = 'Ground level';
     else if (ch === 4) read = 'Index of work';
     else if (ch === 5) read = `Project ${(S.workCase || 0) + 1} of ${screens.length}`;
@@ -1148,6 +1153,7 @@
   const detailTitle = $('#detailTitle');
   const detailSummary = $('#detailSummary');
   const detailSections = $('#detailSections');
+  const detailPreviews = $('#detailPreviews');
   const detailLinks = $('#detailLinks');
   const detailVisual = $('#detailVisual');
   let detailReturnFocus = null;
@@ -1169,16 +1175,17 @@
           ['Related desktop voice operator', 'https://github.com/channallikrishnasai/The-Opero'],
         ],
       },
-      facerex: {
-        eyebrow: 'Computer vision · mobile-oriented inference', title: 'FaceRex', accent: '#ff5a1e',
-        summary: 'A face-recognition application using computer vision and mobile-oriented inference.',
+      proofline: {
+        eyebrow: 'Open-source digital forensics · AI agent activity', title: 'Proofline', accent: '#9abaff',
+        summary: 'Proofline is an open-source digital forensics and incident-response project for investigating activity from AI coding agents. It collects, preserves and analyzes evidence so responders can distinguish an agent’s narrative from actions supported by records.',
         sections: [
-          ['Problem', 'Face-recognition workflows for a mobile-oriented application.'],
-          ['Solution', 'A computer-vision face-recognition application, as described in the supplied project information.'],
-          ['Technology', 'Project-specific technologies have not been provided.'],
-          ['Key features', 'A feature list was not available in the materials reviewed.'],
-          ['Implementation details', 'Mobile-oriented inference is noted; model, runtime and implementation details are not verified.'],
-        ], links: [],
+          ['Problem', 'AI agents can run commands, edit files and use tools or MCP servers, while the evidence is scattered across transcripts, configuration and endpoint logs. A model saying an action happened does not prove that it did.'],
+          ['Solution', 'A Go command-line tool collects agent artifacts into a sealed case package and analyzes them in a local browser-based case explorer. Independent endpoint, cloud and gateway logs can be added as corroborating witnesses.'],
+          ['Technology', 'Go 1.22 or newer · zero runtime dependencies · CLI · local browser-based case explorer · hash-chained evidence packages.'],
+          ['Key features', 'The README documents agent discovery and collection, case analysis, incident hunting, repository scanning, payload decoding, transcript tamper monitoring, mitigation previews and human-readable or structured reports. Evidence is labeled from ASKED or CLAIMED through RECORDED and corroborated states; insufficient evidence remains UNKNOWN.'],
+          ['Implementation details', 'The `agentdfir` CLI creates and analyzes `.adfir` evidence packages. The project supports local artifact collection and imports from endpoint or forensic sources, with a browser explorer and exports for formats including PDF, HTML, OCSF, SARIF and Timesketch.'],
+          ['Project lineage', 'The repository README describes Proofline as derived from AgentDFIR; attribution and license notices are retained in the repository.'],
+        ], previews: [['Proofline repository · case explorer', 'assets/projects/proofline-hero-app.webp', 'Screenshot from the Proofline repository showing its local case explorer interface.']], links: [['Proofline source repository', 'https://github.com/channallikrishnasai/proofline']],
       },
       vaultiq: {
         eyebrow: 'AI-assisted personal finance', title: 'VaultIQ AI', accent: '#efe7da',
@@ -1198,10 +1205,11 @@
         sections: [
           ['Problem', 'Identify infrastructure damage from imagery.'],
           ['Solution', 'An AI-based damage-detection and image-analysis system, as described in the supplied project information.'],
+          ['Recognition', 'The Inventra 2026 RNSIT Project Open House Panorama certificate names a Best Project award for an AI-based infrastructure image-analysis system.'],
           ['Technology', 'Project-specific technologies have not been provided.'],
           ['Key features', 'A feature list was not available in the materials reviewed.'],
           ['Implementation details', 'Model and implementation details are not verified.'],
-        ], links: [],
+        ], previews: [['Inventra 2026 Best Project certificate', 'assets/certificates/inventra-2026-best-project-infrastructure-image-analysis.jpg', 'Inventra 2026 Best Project certificate for AI-based infrastructure image analysis.']], links: [],
       },
       odin: {
         eyebrow: 'Local-first Android assistant', title: 'ODIN', accent: '#91baff',
@@ -1223,31 +1231,112 @@
         sections: [
           ['Company and role', 'Codomax Digital Solutions — Full Stack Web Development Intern.'],
           ['Duration', 'Internship dates or duration were not provided.'],
-          ['Responsibilities', 'Specific responsibilities were not provided.'],
-          ['Certificate', 'Certificate ID CDM/CERT/945434, issued September 2026. No certificate file or verified viewing link is available in this project.'],
-        ], links: [],
+          ['Responsibilities', 'The completion certificate confirms assigned tasks were completed, but does not describe them in detail.'],
+          ['Certificate', 'Certificate ID CDM/CERT/945434, issued 16 September 2026.'],
+        ],
+        previews: [
+          ['Internship completion certificate', 'assets/certificates/codomax-completion-preview-1.png', 'Codomax Digital Solutions Full Stack Web Development internship completion certificate.'],
+          ['Letter of recommendation · page 1', 'assets/certificates/codomax-recommendation-preview-1.png', 'Codomax Digital Solutions letter of recommendation, page 1 of 2, dated 16 September 2026.'],
+          ['Letter of recommendation · page 2', 'assets/certificates/codomax-recommendation-preview-2.jpg', 'Codomax Digital Solutions letter of recommendation, page 2 of 2.'],
+        ],
+        links: [],
       },
       stoxra: {
-        eyebrow: 'Completed internship', title: 'Stoxra', accent: '#8c8cff',
-        summary: 'A completed internship at Stoxra.',
+        eyebrow: 'Completed internship · certificate verified', title: 'Stoxra Technologies', accent: '#8c8cff',
+        summary: 'Growth and Business Development · SEO & Web Development Intern · 20 August–20 October 2026.',
         sections: [
-          ['Company and role', 'Stoxra — internship completed. A specific role was not provided.'],
-          ['Duration', 'Dates or duration were not provided.'],
-          ['Responsibilities', 'Specific responsibilities were not provided.'],
-          ['Certificate', 'No certificate details or verified certificate link were provided.'],
-        ], links: [],
+          ['Company and role', 'Stoxra Technologies — SEO & Web Development Intern in the Growth and Business Development program.'],
+          ['Internship dates', 'Started 20 August 2026 and completed 20 October 2026, as stated on the completion certificate.'],
+          ['Areas of contribution', 'Webpage development, SEO optimization, and website management.'],
+          ['Certificate', 'Certificate ID STX-CERT-2026-A4BCED62A7 · issued 23 October 2026.'],
+        ],
+        previews: [
+          ['Internship completion certificate', 'assets/certificates/stoxra-internship-completion-preview-1.png', 'Stoxra Technologies certificate of internship completion for Krishna Sai Channalli, SEO and Web Development Intern.'],
+        ],
+        links: [],
+      },
+      gemini: {
+        eyebrow: 'Campus ambassador', title: 'Google Gemini Student Ambassador', accent: '#a9a1ff',
+        summary: 'A campus-facing student ambassador role focused on helping peers discover and use Gemini and Google AI.',
+        sections: [
+          ['Role', 'Google Gemini Student Ambassador · campus ambassador.'],
+          ['Program', 'Google describes its India student ambassador program as a way to build practical AI experience and campus impact.'],
+          ['Campus focus', 'The program overview describes leading campus activations, building a student community, and helping students explore practical uses of Gemini.'],
+        ],
+        links: [],
       },
     },
     achievement: {
-      participation: {
-        eyebrow: 'Participation', title: 'Hackathons', accent: '#efe7da',
-        summary: 'Participated in approximately 19 hackathons.',
-        sections: [['Recognition', 'This records participation only; it does not claim a win or ranking.']], links: [],
+      'certified-participation': {
+        eyebrow: 'Participation certificates', title: 'Hackathon record', accent: '#efe7da',
+        summary: 'Six supplied certificates document event participation. They do not claim a win or ranking.',
+        sections: [
+          ['ET AI Hackathon 2.0', 'Certificate of participation · issued 26 August 2026.'],
+          ['DECODE SIH 2026', 'Participation certificate from OSCode.'],
+          ['The HIVE', 'Participation in a 24-hour AI hackathon organized by Applybee AI.'],
+          ['StoxraHack 2026', 'Certificate of participation · issued 10 September 2026.'],
+          ['Agents That Act', 'TrueFoundry × Polaris hackathon · 26 September 2026 · Bengaluru.'],
+          ['TVS Credit E.P.I.C 8.0', 'Participation in the IT Challenge · certificate dated 10 October 2026.'],
+        ],
+        previews: [
+          ['ET AI Hackathon 2.0 certificate', 'assets/certificates/et-ai-hackathon-2-participation-preview-01.jpg', 'ET AI Hackathon 2.0 participation certificate.'],
+          ['DECODE SIH 2026 certificate', 'assets/certificates/decode-sih-2026-participation-preview-01.jpg', 'DECODE SIH 2026 participation certificate.'],
+          ['The HIVE certificate', 'assets/certificates/hive-24-hour-ai-hackathon-participation-preview-01.jpg', 'The HIVE 24-hour AI Hackathon participation certificate.'],
+          ['StoxraHack 2026 certificate', 'assets/certificates/stoxrahack-2026-participation-preview-01.jpg', 'StoxraHack 2026 participation certificate.'],
+          ['Agents That Act certificate', 'assets/certificates/truefoundry-polaris-agents-that-act-participation-preview-01.jpg', 'TrueFoundry Polaris Agents That Act participation certificate.'],
+          ['TVS Credit E.P.I.C 8.0 certificate', 'assets/certificates/tvs-credit-epic-8-it-challenge-participation-preview-01.jpg', 'TVS Credit E.P.I.C 8.0 IT Challenge participation certificate.'],
+        ], links: [],
+      },
+      inventra: {
+        eyebrow: 'Project award · RNSIT', title: 'Inventra 2026', accent: '#ffb23f',
+        summary: 'The supplied RNS Institute of Technology certificate records a Best Project award at the Inventra 2026 Project Open House Panorama.',
+        sections: [['Awarded project', 'AI-based image analysis system for infrastructure. The certificate identifies it as a Best Project award.']],
+        previews: [['Inventra 2026 Best Project certificate', 'assets/certificates/inventra-2026-best-project-infrastructure-image-analysis.jpg', 'Inventra 2026 Best Project certificate for AI-based infrastructure image analysis.']], links: [],
+      },
+      moss: {
+        eyebrow: 'Certificate of achievement · 2026', title: 'Moss: The Zero-Latency Builder Sprint', accent: '#ffb23f',
+        summary: 'A HiDevs × AI House certificate recognizes participation and contribution to the builder sprint. No ranking is stated.',
+        sections: [['Recognition', 'The certificate describes creativity, technical work, innovation and execution using Moss; it does not state a placement.']],
+        previews: [['Moss builder sprint certificate', 'assets/certificates/moss-zero-latency-builder-sprint-achievement-preview-01.jpg', 'Moss Zero-Latency Builder Sprint certificate of achievement.']], links: [],
+      },
+      learning: {
+        eyebrow: 'Course and workshop records', title: 'Learning & assessments', accent: '#ffb23f',
+        summary: 'Eight supplied records cover course completion, assessment, workshop participation and an aptitude-test participation certificate.',
+        sections: [
+          ['Python Fundamentals', 'Infosys Springboard · completed 10 December 2025.'],
+          ['Digital Engineering', 'FutureSkills Prime / NASSCOM assessment · Gold category · 82% · issued 5 May 2026.'],
+          ['C programming course', 'Infosys Springboard · completed 19 May 2025.'],
+          ['C Training', 'EduPyramids, SINE, IIT Bombay · 11 May 2026 · 95%.'],
+          ['C++ Training', 'EduPyramids, SINE, IIT Bombay · 11 May 2026 · 82.5%.'],
+          ['Ethical Hacking & Cybersecurity Workshop', 'VaultofCodes · two-hour workshop assessment · 70/100 · 15 September 2026.'],
+          ['Recent Trends and Tools in AI for Researchers', 'One-day FDP participation · Bangalore Technological Institute, IEEE Bangalore Section and PencilBitz · 8 August 2026.'],
+          ['Internship Common Aptitude Test', 'Participation certificate · 17 August 2026. This records participation, not an internship offer or placement.'],
+        ],
+        previews: [
+          ['Python Fundamentals certificate', 'assets/certificates/python-fundamentals-infosys-preview-01.jpg', 'Infosys Springboard Python Fundamentals certificate.'],
+          ['Digital Engineering assessment certificate · page 1', 'assets/certificates/digital-engineering-nasscom-gold-assessment-preview-01.jpg', 'NASSCOM Digital Engineering Gold assessment certificate, page 1.'],
+          ['Digital Engineering assessment certificate · page 2', 'assets/certificates/digital-engineering-nasscom-gold-assessment-preview-02.jpg', 'NASSCOM Digital Engineering Gold assessment certificate, page 2.'],
+          ['C programming course certificate', 'assets/certificates/c-programming-infosys.jpg', 'Infosys Springboard C programming course certificate.'],
+          ['C Training certificate', 'assets/certificates/c-training-edupyramids-sine-iit-bombay-preview-01.jpg', 'EduPyramids SINE IIT Bombay C Training certificate.'],
+          ['C++ Training certificate', 'assets/certificates/cpp-training-edupyramids-sine-iit-bombay-preview-01.jpg', 'EduPyramids SINE IIT Bombay C++ Training certificate.'],
+          ['Ethical Hacking & Cybersecurity Workshop · page 1', 'assets/certificates/ethical-hacking-cybersecurity-workshop-assessment-preview-01.jpg', 'Ethical Hacking and Cybersecurity Workshop assessment certificate, page 1.'],
+          ['Ethical Hacking & Cybersecurity Workshop · page 2', 'assets/certificates/ethical-hacking-cybersecurity-workshop-assessment-preview-02.jpg', 'Ethical Hacking and Cybersecurity Workshop assessment certificate, page 2.'],
+          ['AI for Researchers FDP certificate', 'assets/certificates/ai-for-researchers-fdp-participation.jpg', 'AI for Researchers FDP participation certificate.'],
+          ['Internship Common Aptitude Test certificate', 'assets/certificates/icat-participation-preview-01.jpg', 'Internship Common Aptitude Test participation certificate.'],
+        ], links: [],
       },
       paytm: {
-        eyebrow: 'Hackathon ranking', title: 'Paytm Hackathon', accent: '#ff5a1e',
-        summary: 'Selected among the Top 15 teams out of 2,000+ teams.',
-        sections: [['Recognition', 'The reported result is a Top 15 team selection. No additional award or win is claimed.']], links: [],
+        eyebrow: 'Hackathon build · ArthiX', title: 'Paytm Hackathon', accent: '#ff5a1e',
+        summary: 'Top 15 selection among 2,000+ teams. The hackathon build was ArthiX: a connected, self-hostable business workspace that brings operational tools and event-driven workflows together.',
+        sections: [
+          ['Recognition', 'Top 15 among 2,000+ teams, as stated in the supplied portfolio record. This is the reported ranking; no additional award is implied.'],
+          ['What I built', 'ArthiX is a modular business workspace for CRM, finance, people, projects, service and operations. The public repository also documents a browser-based admin workspace, API, marketing site, plugin marketplace, shared packages and official integration plugins.'],
+          ['How it works', 'The workspace organizes business records in domain modules. API services and shared core packages connect those areas; configurable event-driven workflows handle routine steps such as finance approvals. PostgreSQL and Redis support the documented deployment. Optional AI and integrations require configuration.'],
+          ['Technology', 'Next.js admin workspace, Hono API on Node.js, shared TypeScript packages, PostgreSQL 16 with pgvector, Redis 7, Docker Compose and pnpm 9.'],
+          ['Build boundary', 'The feature map and stack are verified against the public ArthiX repository. The detailed flow below visualizes the documented architecture; it does not claim every workflow or integration was enabled in the hackathon demo.'],
+        ],
+        previews: Array.from({length:10}, (_,i) => [`ArthiX overview · page ${i+1} of 10`, `assets/project-documents/arthix-overview-preview-${String(i+1).padStart(2,'0')}.jpg`, `ArthiX project overview document, page ${i+1} of 10.`]),
+        links: [['ArthiX source repository', 'https://github.com/channallikrishnasai/ArthiX']],
       },
     },
   };
@@ -1263,6 +1352,7 @@
     'python': [['The-Opero', 'https://github.com/channallikrishnasai/The-Opero'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH'], ['Ecommerce Store', 'https://github.com/channallikrishnasai/Ecommerce_Store']],
     'fastapi': [['The-Opero', 'https://github.com/channallikrishnasai/The-Opero'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
     'node.js': [['OPERO', 'https://github.com/channallikrishnasai/OPERO']],
+    'go': [['Proofline', 'https://github.com/channallikrishnasai/proofline']],
     'postgresql': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
     'prisma': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai']],
     'redis': [['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform']],
@@ -1270,8 +1360,8 @@
     'rest apis': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['SocialMediaPlatform', 'https://github.com/channallikrishnasai/SocialMediaPlatform'], ['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
     'onnx': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
     'opencv': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
-    'computer vision': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH'], ['FaceRex (description supplied; no public source link)', '']],
-    'face recognition': [['FaceRex (description supplied; no public source link)', '']],
+    'computer vision': [['KAVACH', 'https://github.com/channallikrishnasai/KAVACH']],
+    'face recognition': [],
     'ai application development': [['OPERO', 'https://github.com/channallikrishnasai/OPERO'], ['VaultIQ AI', 'https://github.com/channallikrishnasai/vaultiq-ai'], ['LifeOS AI', 'https://github.com/channallikrishnasai/LifeOS-AI'], ['The-Opero', 'https://github.com/channallikrishnasai/The-Opero']],
     'kotlin': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
     'android': [['ODIN Android assistant', 'https://github.com/channallikrishnasai/odin-android']],
@@ -1308,15 +1398,18 @@
     'html5': ['Frontend engineering', 'used', 'HTML structures this portfolio.'],
     'css3': ['Frontend engineering', 'used', 'CSS styles this portfolio.'],
     'tailwind css': ['Frontend engineering', 'used', 'Tailwind CSS is listed in the OPERO and VaultIQ project stacks.'],
+    'c programming': ['Programming foundations', 'explored', 'Completed a C programming course with Infosys Springboard and C training through EduPyramids, SINE and IIT Bombay. No project implementation is claimed here.'],
+    'c++': ['Programming foundations', 'explored', 'Completed C++ training through EduPyramids, SINE and IIT Bombay. No project implementation is claimed here.'],
     'python': ['Backend engineering', 'used', 'Python is used by The-Opero and documented in related project sources.'],
     'fastapi': ['Backend engineering', 'used', 'FastAPI is documented in KAVACH and related project sources.'],
     'node.js': ['Backend engineering', 'used', 'Node.js is used for the OPERO API foundation.'],
+    'go': ['Programming languages', 'used', 'Go is used in the Proofline command-line forensics and case-analysis project.'],
     'rest apis': ['Backend engineering', 'used', 'API routes and service endpoints are documented in OPERO and related projects.'],
     'ai application development': ['AI & machine learning', 'used', 'AI application work is documented in VaultIQ AI and The-Opero.'],
     'gemini': ['AI & machine learning', 'used', 'The-Opero documents Gemini integration. KAVACH documents Gemini as an optional advisory that cannot approve or dispatch. This is separate from the public OPERO Phase 0 repository.'],
     'onnx': ['Computer vision', 'used', 'KAVACH includes a local ONNX Runtime road-damage provider; compatible model weights require separate configuration.'],
     'opencv': ['Computer vision', 'used', 'KAVACH uses OpenCV for image and video frame processing.'],
-    'face recognition': ['Computer vision', 'explored', 'FaceRex is described as a face-recognition application, but no public source, model, or runtime was supplied to verify implementation details.'],
+    'face recognition': ['Computer vision', 'explored', 'Explored as a technical area; no verified project implementation is currently linked.'],
     'kotlin': ['Mobile development', 'used', 'Kotlin is used by the ODIN Android assistant repository.'],
     'android': ['Mobile development', 'used', 'ODIN is documented as a native Android assistant.'],
     'postgresql': ['Databases & infrastructure', 'used', 'PostgreSQL is listed in the OPERO and VaultIQ project documentation.'],
@@ -1362,6 +1455,17 @@
         ['Report', '07 / REPORT', 'The final documented stage reports the outcome.'],
       ],
     },
+    proofline: {
+      title: 'PROOFLINE / EVIDENCE TO INVESTIGATION', badge: 'CLAIM → RECORD → CORROBORATE', color: 'proofline',
+      foot: 'Flow follows the public Proofline README · AI-generated narrative alone is not treated as proof',
+      steps: [
+        ['Discover', '01 / DISCOVER AGENTS', 'The CLI detects supported AI-agent installations and gathers locally available agent artifacts without launching the agents.'],
+        ['Preserve', '02 / SEAL EVIDENCE', 'Collected artifacts are preserved in a case package with hash-chained evidence and provenance.'],
+        ['Analyze', '03 / RECONSTRUCT ACTIVITY', 'The analysis correlates agent transcripts, recorded tool calls and related artifacts into findings with source references.'],
+        ['Corroborate', '04 / ADD A SECOND WITNESS', 'Endpoint, cloud-audit or MCP-gateway logs can strengthen, disprove or leave a claim unresolved.'],
+        ['Report', '05 / EXPLAIN THE RESULT', 'The local case explorer presents findings and evidence states; reports can also be exported to supported structured formats.'],
+      ],
+    },
     vaultiq: {
       title: 'VAULTIQ AI / APPLICATION ARCHITECTURE', badge: 'PLAN · STORE · ANALYZE', color: 'vault',
       foot: 'Repository-backed architecture map · no automated financial transactions are implied',
@@ -1382,6 +1486,17 @@
         ['Review', '03 / REVIEW CONCEPT', 'A review output is shown only as a conceptual endpoint. No specific report or decision feature was verified.'],
       ],
     },
+    paytm: {
+      title: 'ARTHIX / BUSINESS WORKFLOW ARCHITECTURE', badge: 'CONNECTED WORKSPACE · CONFIGURABLE FLOWS', color: 'opero',
+      foot: 'Architecture visualization based on the public ArthiX repository and supplied overview · workflow availability depends on configuration',
+      steps: [
+        ['Workspace', '01 / ADMIN WORKSPACE', 'The repository documents a browser-based Next.js admin workspace for interacting with the platform.'],
+        ['Business modules', '02 / DOMAIN MODULES', 'CRM, finance, people, projects, service and operations organize the main business domains.'],
+        ['API + core', '03 / SHARED SERVICES', 'The Hono API and shared core packages provide service and business-entity boundaries in the repository structure.'],
+        ['Workflow rules', '04 / EVENT-DRIVEN STEPS', 'Configurable business workflows connect events to routine steps; finance approval flows are among the documented use cases.'],
+        ['Data + integrations', '05 / PLUGINS & DATA', 'PostgreSQL, Redis and official integration plugins support configured deployments. Optional AI requires a supported provider and credentials.'],
+      ],
+    },
     odin: {
       title: 'ODIN / REQUEST TO DEVICE RESULT', badge: 'LOCAL-FIRST · CAPABILITY CHECKED', color: 'odin',
       foot: 'Repository-documented provider boundaries · examples require configured permissions, providers and devices',
@@ -1391,15 +1506,6 @@
         ['Capability', '03 / CHECK CAPABILITY', 'Tool and device-provider boundaries determine whether an action is available in the configured environment.'],
         ['Permission', '04 / SETUP + PERMISSION', 'Unavailable providers or missing permissions return an explicit setup or capability result; actions must not be reported as completed.'],
         ['Result', '05 / REPORT RESULT', 'The documented flow reports a confirmed action or a failure/unavailable result. Voice output can use the configured TTS path.'],
-      ],
-    },
-    facerex: {
-      title: 'FACEREX / CONCEPT FLOW', badge: 'ILLUSTRATIVE · IMPLEMENTATION UNKNOWN', color: 'face',
-      foot: 'Illustrative from the supplied FaceRex description · model, runtime, enrollment and matching behavior are unverified',
-      steps: [
-        ['Mobile image', '01 / MOBILE INPUT', 'The supplied description calls FaceRex a mobile-oriented face-recognition application; the capture implementation is unknown.'],
-        ['Vision', '02 / COMPUTER VISION', 'Face recognition is part of the supplied description. No specific detection or recognition model was verified.'],
-        ['Inference', '03 / MOBILE INFERENCE', 'Mobile-oriented inference is mentioned, but runtime, data handling and result behavior are not documented.'],
       ],
     },
   };
@@ -1416,11 +1522,10 @@
 
   function skillDetail(name) {
     const matches = SKILL_PROJECTS[name.toLowerCase()] || [];
-    const meta = SKILL_META[name.toLowerCase()] || ['Developer tools', 'explored', 'No implementation-specific project evidence is available in the reviewed sources.'];
+    const meta = SKILL_META[name.toLowerCase()] || ['Developer stack', 'familiar', 'Included in the technology list supplied by Krishna Sai. No featured-project connection is claimed unless a verified repository or implementation is linked.'];
     const notes = {
       onnx: 'KAVACH implements a local ONNX Runtime road-damage provider. Compatible model weights and a verified model license must be configured separately.',
       opencv: 'KAVACH uses OpenCV for image and video frame processing. Its non-classifying contrast cues are not presented as damage detections; model detections require a compatible configured ONNX model.',
-      'face recognition': 'This project connection is based on the supplied FaceRex description. No public source or model implementation details were available to verify.',
     };
     const levelName = meta[1] === 'used' ? 'Used in projects' : meta[1] === 'explored' ? 'Explored' : 'Familiar with';
     const sections = [
@@ -1430,11 +1535,21 @@
         : 'No verified repository or implementation connection is available in the reviewed sources.'],
     ];
     if (notes[name.toLowerCase()]) sections.push(['Implementation note', notes[name.toLowerCase()]]);
+    const links = matches.filter(([, url]) => url).map(([project, url]) => [project + ' repository', url]);
+    const skillCertificates = {
+      'c programming': [
+        ['C programming course certificate', 'assets/certificates/c-programming-infosys.jpg'],
+        ['C Training certificate', 'assets/certificates/c-training-edupyramids-sine-iit-bombay-preview-01.jpg'],
+      ],
+      'c++': [['C++ Training certificate', 'assets/certificates/cpp-training-edupyramids-sine-iit-bombay-preview-01.jpg']],
+    };
+    const skillPreviews = (skillCertificates[name.toLowerCase()] || []).map(([heading,src]) => [heading,src,heading]);
     return {
       eyebrow: 'Technical skill', title: name, accent: '#ffb23f',
       summary: 'Project connections are shown only where a repository manifest, source file or project documentation supports the technology.',
       sections,
-      links: matches.filter(([, url]) => url).map(([project, url]) => [project + ' repository', url]),
+      previews: skillPreviews,
+      links,
     };
   }
 
@@ -1446,7 +1561,7 @@
     detailSummary.textContent = detail.summary;
     detailDialog.style.setProperty('--detail-accent', detail.accent || '#ffb23f');
     const detailType = (trigger?.dataset.detail || '').split(':');
-    const art = detailType[0] === 'project' ? projectArt[detailType[1]] : '';
+    const art = detailType[0] === 'project' ? projectArt[detailType[1]] : detailType[0] === 'achievement' ? projectArt[detailType[1]] : '';
     detailVisual.replaceChildren();
     detailVisual.hidden = !art;
     if (art) {
@@ -1455,7 +1570,7 @@
       const flowCopy = $('.flow-inspector-copy', detailVisual);
       $$('[data-flow-step]', detailVisual).forEach((node) => node.addEventListener('click', () => {
         const index = Number(node.dataset.flowStep);
-        const flow = PROJECT_FLOWS[detailType[1]];
+        const flow = PROJECT_FLOWS[detailType[0] === 'achievement' ? detailType[1] : detailType[1]];
         const item = flow?.steps[index]?.slice(1);
         if (!item) return;
         $$('[data-flow-step]', detailVisual).forEach((other) => {
@@ -1501,6 +1616,22 @@
       }
       detailSections.appendChild(section);
     });
+    detailPreviews.replaceChildren();
+    const previews = detail.previews || [];
+    detailPreviews.hidden = !previews.length;
+    previews.forEach(([heading, src, alt]) => {
+      const section = document.createElement('section');
+      section.className = 'detail-preview';
+      const title = document.createElement('h3');
+      title.textContent = heading;
+      const image = document.createElement('img');
+      image.src = src;
+      image.alt = alt;
+      image.loading = 'lazy';
+      image.decoding = 'async';
+      section.append(title, image);
+      detailPreviews.appendChild(section);
+    });
     detailLinks.replaceChildren();
     if (detail.links.length) {
       detail.links.forEach(([label, href]) => {
@@ -1512,10 +1643,10 @@
         link.textContent = label + ' ↗';
         detailLinks.appendChild(link);
       });
-    } else {
+    } else if (!previews.length) {
       const note = document.createElement('p');
       note.className = 'detail-no-links';
-      note.textContent = 'No verified repository, certificate file or live demo link is available for this item.';
+      note.textContent = 'No external link is available for this item.';
       detailLinks.appendChild(note);
     }
     detailReturnFocus = trigger;
