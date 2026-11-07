@@ -1299,6 +1299,17 @@
         sections: [['Recognition', 'The certificate describes creativity, technical work, innovation and execution using Moss; it does not state a placement.']],
         previews: [['Moss builder sprint certificate', 'assets/certificates/moss-zero-latency-builder-sprint-achievement-preview-01.jpg', 'Moss Zero-Latency Builder Sprint certificate of achievement.']], links: [],
       },
+      'ethical-genai': {
+        eyebrow: 'Bootcamp completion · VaultofCodes', title: 'Ethical Hacking & GenAI Bootcamp', accent: '#e7a23d',
+        summary: 'Completed all modules of the Ethical Hacking & GenAI Bootcamp, as recorded on the supplied VaultofCodes certificate.',
+        sections: [
+          ['Certificate', 'VaultofCodes bootcamp completion certificate · UID IEK3JS. The certificate does not show an issue date.'],
+          ['Ethical hacking & cybersecurity', 'Python for cybersecurity tasks; reconnaissance and information gathering; network scanning and vulnerability identification; exploitation concepts and techniques; bug bounty fundamentals and vulnerability reporting; cyber laws and digital forensics.'],
+          ['Generative AI', 'Generative AI fundamentals, capabilities and practical applications, including how AI can complement technical workflows.'],
+          ['Takeaway', 'Cybersecurity also means understanding systems, thinking critically and using technical knowledge responsibly. Next steps include practical projects, hands-on labs and continued learning.'],
+        ],
+        previews: [['Ethical Hacking & GenAI Bootcamp completion certificate', 'assets/certificates/ethical-hacking-genai-bootcamp-vaultofcodes-completion-preview-01.jpg', 'VaultofCodes Ethical Hacking & GenAI Bootcamp completion certificate for Krishna Sai Channalli.']], links: [],
+      },
       learning: {
         eyebrow: 'Course and workshop records', title: 'Learning & assessments', accent: '#ffb23f',
         summary: 'Eight supplied records cover course completion, assessment, workshop participation and an aptitude-test participation certificate.',
